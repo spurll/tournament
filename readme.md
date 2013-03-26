@@ -1,7 +1,15 @@
 Overview
 ========
 
+tournament.py
+-------------
+
 A Python program that facilitates a Magic: The Gathering limited tournament (sealed or draft). Players are randomized, seated, and paired. Match results are recorded, standings may be displayed, etc.
+
+### Arguments
+
+Positional:
+ * A list of player names. (You probably don't want to use the default list, which is a list of people with whom the author frequently plays Magic.)
 
 Bugs and Feature Requests
 =========================
