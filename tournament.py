@@ -17,9 +17,6 @@
 #   already played each other.
 #
 #   Players can hypothetically achieve multiple byes (only if they suck).
-# 
-#   If players have been seated, and THEN people drop (and are not reseated)
-#   pairings are FUCKED.
 
 # More information about byes, tiebreakers, etc. can be found here:
 # http://www.wizards.com/ContentResources/Wizards/WPN/Main/Documents/Magic_The_Gathering_Tournament_Rules_PDF2.pdf
