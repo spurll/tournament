@@ -138,15 +138,15 @@ class Player:
         if self.matches == 0:
             percent = 0.33
         else:
-            percent = self.match_points / (self.matches + self.byes)
-        return max(round(percent), 0.33)
+            percent = self.match_points() / (3.0 * (self.matches + self.byes))
+        return max(round(percent, 2), 0.33)
 
     def game_win_percentage(self):
         if self.games == 0:
             percent = 0.33
         else:
-            percent = self.game_points / (self.games + (2 * self.byes))
-        return max(round(percent), 0.33)
+            percent = self.game_points() / (3.0 * (self.games + (2*self.byes)))
+        return max(round(percent, 2), 0.33)
 
     def opponent_match_win_percentage(self):
         if self.matches == 0: return 0.33
@@ -394,7 +394,7 @@ def report_results(players):
     reported = [active[k].reported for k in active.keys()]
 
     while not all(reported):
-        pairs = []
+        pairs, choices = [], []
         for p in active.values():
             if p.opponent and not p.reported:
                 if p.opponent == BYE_TEXT:
@@ -404,6 +404,7 @@ def report_results(players):
                 elif p.name not in [i.name for sub in pairs for i in sub if
                                     isinstance(i, Player)]:
                     pairs.append((p.table, p, p.opponent))
+                    choices.append(p.table)
 
         if not pairs:
             print "Warning: You must pair players before reporting! (ENTER "  \
@@ -412,14 +413,17 @@ def report_results(players):
             return
 
         pairs.sort()    # Sort by table number.
+        choices.sort()
 
         choice = menu("Report Match Results", *zip(*pairs), 
                       headers=["Table", "Player", "Opponent"],
                       footer="Select a table to report (ENTER to cancel).",
-                      input_range=range(1,len(pairs)+1)+[""])
+                      input_range=choices+[""])
         if not choice: return
 
-        p = pairs[int(choice) - 1][1]
+        # Convert from table number to list index.
+        choice = choices.index(int(choice))
+        p = pairs[choice][1]
         wins = menu("Match Results: {} versus {}".format(p.name,
                     p.opponent.name), ["How many games did {} "
                     "win?".format(p.name)], footer="ENTER to cancel.",
