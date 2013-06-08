@@ -11,12 +11,17 @@
 #   Add full logging, including the IP address of whomever connects (for
 #   stats-gathering purposes).
 #
+#   Should walk a tree and find optimal pairings among players, then randomly
+#   select between optimals.
+#
 # Known Bugs:
 #
 #   Pairings can result in multiple byes if bottom-rung players have
 #   already played each other.
 #
 #   Players can hypothetically achieve multiple byes (only if they suck).
+#
+#   Manual pairing says: "As a result, Curt is now paired with BYE."
 
 # More information about byes, tiebreakers, etc. can be found here:
 # http://www.wizards.com/ContentResources/Wizards/WPN/Main/Documents/Magic_The_Gathering_Tournament_Rules_PDF2.pdf
@@ -24,139 +29,15 @@
 
 import argparse, random, math
 from table import table, menu
+from player import Player
 
 
 DEFAULT_PLAYERS = {"Gem", "Curt", "Matt", "Cozmin", "Eric", "Brendan",
                    "Dustin", "Dale", "Bhavek", "Mike", "Aron", "Nick"}
 
 DEFAULT_STRING = "Richard Garfield"
-BYE_TEXT = "BYE"
+BYE = Player("BYE", is_bye_player=True)
 IDEAL_TABLE = 8
-
-
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.matches = 0            # Does not include byes.
-        self.match_wins = 0
-        self.match_draws = 0
-        self.games = 0              # Does not include byes.
-        self.game_wins = 0
-        self.game_draws = 0
-        self.byes = 0               # Treated as a match win (2-0).
-        self.table = None
-        self.seat = None
-        self.opponent = None        # May contain BYE_TEXT.
-        self.past_opponents = []    # Does not include byes.
-        self.active = True
-        self.reported = False
-
-    def __repr__(self):
-        return self.name
-
-    def __lt__(self, other):
-        if not isinstance(other, Player):
-            return False
-
-        if self.active < other.active:
-            return True
-        elif self.active > other.active:
-            return False
-
-        if self.points() < other.points():
-            return True
-        elif self.points() > other.points():
-            return False
-
-        if self.opponent_match_win_percentage() <                             \
-                other.opponent_match_win_percentage():
-            return True
-        elif self.opponent_match_win_percentage() >                           \
-                other.opponent_match_win_percentage():
-            return False
-
-        if self.game_win_percentage() < other.game_win_percentage():
-            return True
-        elif self.game_win_percentage() > other.game_win_percentage():
-            return False
-
-        if self.opponent_game_win_percentage() <                              \
-                other.opponent_game_win_percentage():
-            return True
-        else:
-            return False
-
-    def __eq__(self, other):
-        if not isinstance(other, Player):
-            return False
-        return not self < other and not other < self
-
-    def __ne__(self, other):
-        if not isinstance(other, Player):
-            return False
-        return self < other or other < self
-
-    def __ge__(self, other):
-        if not isinstance(other, Player):
-            return False
-        return not self < other
-
-    def __le__(self, other):
-        if not isinstance(other, Player):
-            return False
-        return not other < self
-
-    def __gt__(self, other):
-        if not isinstance(other, Player):
-            return False
-        return other < self
-
-    def drop(self):
-        self.active = False
-
-    def points(self):
-        return self.match_points()
-
-    def tb_1(self):
-        return self.opponent_match_win_percentage()
-
-    def tb_2(self):
-        return self.game_win_percentage()
-
-    def tb_3(self):
-        return self.opponent_game_win_percentage()
-
-    def match_points(self):
-        # A bye is considered a match win, and is worth 3 match points.
-        return (3 * (self.match_wins + self.byes)) + self.match_draws
-
-    def game_points(self):
-        # A bye is considered two game wins, and is worth 6 game points.
-        return (3 * (self.game_wins + (2 * self.byes))) + self.game_draws
-
-    def match_win_percentage(self):
-        if self.matches == 0:
-            percent = 0.33
-        else:
-            percent = self.match_points() / (3.0 * (self.matches + self.byes))
-        return max(round(percent, 2), 0.33)
-
-    def game_win_percentage(self):
-        if self.games == 0:
-            percent = 0.33
-        else:
-            percent = self.game_points() / (3.0 * (self.games + (2*self.byes)))
-        return max(round(percent, 2), 0.33)
-
-    def opponent_match_win_percentage(self):
-        if self.matches == 0: return 0.33
-        percentage = [o.match_win_percentage() for o in self.past_opponents]
-        return round(sum(percentage) / len(percentage), 2)
-
-    def opponent_game_win_percentage(self):
-        if self.games == 0: return 0.33
-        percentage = [o.game_win_percentage() for o in self.past_opponents]
-        return round(sum(percentage) / len(percentage), 2)
 
 
 def tournament(players=None):
@@ -235,7 +116,7 @@ def pair_players(players):
         active[p].reported = False
 
     # If no one has any points, it's the first round, so pair people by seat.
-    bye = None
+    bye_player = None
     player_list = active.values()
     player_count = len(active)
     table = 1
@@ -280,7 +161,7 @@ def pair_players(players):
         if player_count:
             if player_count % 2 != 0:
                 # The player in the last seat is not paired at this table.
-                bye = unpaired[player_count - 1]
+                bye_player = unpaired[player_count - 1]
                 player_count -= 1
 
             # Each player will face an opponent halfway around their table.
@@ -322,12 +203,12 @@ def pair_players(players):
                     break
             else:
                 if not player_list[i].opponent:
-                    bye = player_list[i]
+                    bye_player = player_list[i]
 
-    if bye:
-        pairs.append((table, bye.name, BYE_TEXT))
-        bye.opponent = BYE_TEXT
-        bye.table = table
+    if bye_player:
+        pairs.append((table, bye_player.name, BYE))
+        bye_player.opponent, BYE.opponent = BYE, bye_player
+        bye_player.table, BYE.table = table, table
 
     menu("Pairings", *zip(*pairs), headers=["Table", "Player", "Opponent"],
          footer="ENTER to continue.")
@@ -355,7 +236,7 @@ def edit_pairings(players):
         player_list.sort(key=lambda p: p.table)
         pairs = [(player_list[i].table, player_list[i].name,
                  player_list[i].opponent.name) for i in range(0,
-                 len(player_list) - 1, 2)]
+                 len(player_list), 2)]
 
         player_1 = menu("Pairings", *zip(*pairs), headers=["Table", "Player",
                         "Opponent"], footer="Enter a player's name to change "
@@ -397,7 +278,7 @@ def report_results(players):
         pairs, choices = [], []
         for p in active.values():
             if p.opponent and not p.reported:
-                if p.opponent == BYE_TEXT:
+                if p.opponent is BYE:
                     p.reported = True
                     p.byes += 1
                     p.opponent = None
