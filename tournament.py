@@ -16,6 +16,9 @@
 #
 # Known Bugs:
 #
+#   When editing pairings involving a bye, the message says "...as a result,
+#   ______ is now paired with BYE" instead of "...now has a BYE".
+#
 #   Pairings can result in multiple byes if bottom-rung players have
 #   already played each other.
 #
@@ -338,10 +341,10 @@ def report_results(players):
         p.match_draws += wins == losses
         p.opponent.match_draws += wins == losses
 
-        p.game_wins = wins
-        p.opponent.game_wins = losses
-        p.game_draws = draws
-        p.opponent.game_draws = draws
+        p.game_wins += wins
+        p.opponent.game_wins += losses
+        p.game_draws += draws
+        p.opponent.game_draws += draws
         
         p.reported, p.opponent.reported = True, True
         p.past_opponents.append(p.opponent)
@@ -369,6 +372,17 @@ def standings(players):
     menu("Standings", names, points, tiebreaker_1, tiebreaker_2, tiebreaker_3,
          dropped, footer="ENTER to continue.", headers=["Player", "Points",
          "TB 1", "TB 2", "TB 3", "Dropped?"])
+
+
+def player_stats(players):
+    p = DEFAULT_STRING
+    while p:
+        p = menu("Display Player Stats", players.keys(), ["" if
+                    players[k].active else "Yes" for k in players.keys()],
+                    headers=["Player", "Dropped?"], footer="Enter a name to "
+                    "view that player's stats. (ENTER for none).",
+                    input_range=players.keys()+[""])
+        if p: players[p].display()
 
 
 def drop_player(players):
@@ -410,8 +424,9 @@ if __name__ == "__main__":
                  "3. Edit Pairings": edit_pairings,
                  "4. Report Match Results": report_results,
                  "5. Standings": standings,
-                 "6. Drop Player": drop_player,
-                 "7. Exit": None}
+                 "6. Display Player Stats": player_stats,
+                 "7. Drop Player": drop_player,
+                 "8. Exit": None}
 
     parser = argparse.ArgumentParser(description="Runs a Magic: The Gathering "
                                      "limited event (sealed or draft).")

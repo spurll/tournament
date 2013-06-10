@@ -16,6 +16,18 @@ class Player:
         self.reported = False
         self.is_bye_player = is_bye_player
 
+    def display(self):
+        print self.name
+        print "Matches:"
+        print "  Total: {}".format(self.matches)
+        print "  Wins: {}".format(self.match_wins)
+        print "  Draws: {}".format(self.match_draws)
+        print "Games:"
+        print "  Total: {}".format(self.games)
+        print "  Wins: {}".format(self.game_wins)
+        print "  Draws: {}".format(self.game_draws)
+        print "Byes: {}".format(self.byes)
+
     def __repr__(self):
         return self.name
 
