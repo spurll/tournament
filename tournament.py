@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Written by Gem Newman. This work is licensed under a Creative Commons
 # Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
@@ -16,15 +18,10 @@
 #
 # Known Bugs:
 #
-#   When editing pairings involving a bye, the message says "...as a result,
-#   ______ is now paired with BYE" instead of "...now has a BYE".
-#
 #   Pairings can result in multiple byes if bottom-rung players have
 #   already played each other.
 #
 #   Players can hypothetically achieve multiple byes (only if they suck).
-#
-#   Manual pairing says: "As a result, Curt is now paired with BYE."
 
 # More information about byes, tiebreakers, etc. can be found here:
 # http://www.wizards.com/ContentResources/Wizards/WPN/Main/Documents/Magic_The_Gathering_Tournament_Rules_PDF2.pdf
@@ -117,6 +114,7 @@ def pair_players(players):
     # Begin a new round, by setting everyone's "reported" status to false.
     for p in active.keys():
         active[p].reported = False
+        active[p].opponent = None
 
     # If no one has any points, it's the first round, so pair people by seat.
     bye_player = None
@@ -265,10 +263,22 @@ def edit_pairings(players):
                 opponent_2.opponent = opponent_1
                 opponent_1.table = opponent_2.table
 
-                print "{} is paired with {}. As a result, {} is now paired "  \
-                      "with {}. (ENTER to continue.)".format(player_1.name,
-                      player_1.opponent.name, opponent_1.name,
-                      opponent_1.opponent.name)
+                text = "{} is now paired with {}. ".format(player_1.name,
+                       player_2.name)
+
+                if opponent_1 is BYE:
+                    text += "As a result, {} now has a BYE.".format(
+                            opponent_2.name)
+                elif opponent_2 is BYE:
+                    text += "As a result, {} now has a BYE.".format(
+                            opponent_1.name)
+                else:
+                    text += "As a result, {} is now paired with {}.".format(
+                            opponent_1, opponent_2)
+
+                text += " (ENTER to continue.)"
+
+                print text
                 raw_input(">> ")
                 break
 
