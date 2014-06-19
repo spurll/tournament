@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		<div class="section" style="text-align: center"><a href="{{url_for('create_tournament')}}">Create Tournament</a></div>
+		<table>
+			{% for tournament in tournaments %}
+				{% if loop.first %}
+					<tr>
+						<th>ID</th>
+						<th>Tournament Name</th>
+						<th>Players</th>
+						<th>Round</th>
+						<th></th>
+					</tr>
+				{% endif %}
+
+				<tr>
+					<td>{{tournament.id}}</td>
+					<td><a href="{{url_for('resume_tournament', id=tournament.id)}}">{{tournament.name}}</a></td>
+					<td>{{tournament.players.all() | length}}</td>
+					<td>{{tournament.rounds.all() | length}}</td>
+					<td><a href="{{url_for('delete_tournament', id=tournament.id)}}">Delete</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endblock %}
+

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+	<script type="text/javascript" src="static/jquery-2.1.1.js"></script>
+	<script type="text/javascript">
+		$( document ).ready(function() {
+			// Start focus on the tournament name field.
+			$("#name").focus();
+
+			// Populate any names that exist in the hidden field on page load.
+			var names = $("#players").val().split("|");
+			for (var i = 0; i < names.length; i++) {
+				createNameElement(names[i]);
+			}
+
+			// Add a handler to catch any ENTER keypresses.
+			$("#add").keypress(function(event) {
+				if (event.which == 13 || event.keyCode == 13) {
+					event.preventDefault();
+					add();
+				}
+			});
+
+			$("#name").keypress(function(event) {
+				if (event.which == 13 || event.keyCode == 13) {
+					event.preventDefault();
+					$("#add").focus();
+				}
+			});
+
+			$("#reset").click(function(event) {
+				var names = $("#players").val().split("|");
+				for (var i = 0; i < names.length; i++) {
+					remove(names[i]);
+				}
+			});
+		});
+
+		function add() {
+			// Grab name from the form field.
+			var name = $("#add").val();
+
+			if ($("#players").val()) {
+				var list = $("#players").val().split("|");
+			} else {
+				var list = [];
+			}
+
+			// Check to see if it exists, then add to form.players.
+			var exists = $("#" + name.replace(/ /g, "_")).length > 0;
+
+			if (name && !exists) {
+				list.push(name)
+				$("#players").val(list.join("|"));
+				createNameElement(name);
+			}
+
+			// Clear the name from the field and give it focus.
+			$("#add").val("");
+			$("#add").focus();
+		}
+
+		function remove(name) {
+			// Remove element from form.players.
+			var list = $("#players").val().split("|");
+			list.splice(list.indexOf(name), 1);
+			$("#players").val(list.join("|"));
+
+			// Remove visible elements.
+			$("#" + name.replace(/ /g, "_")).remove();
+		}
+
+		function createNameElement(name) {
+			// Add the appropriate visible elements and link to remove.
+			var tr = '<tr id="' + name.replace(/ /g, "_") + '"></tr>';
+			$("#player_list").append(tr);
+
+			var link = '<a href="javascript:remove(\'' + name + '\')">Remove Player</a>';
+			$("#" + name.replace(/ /g, "_")).append('<td>' + name + '</td>');
+			$("#" + name.replace(/ /g, "_")).append('<td style="width: 30%; text-align: right;">' + link + '</td>');
+		}
+	</script>
+
+	<div class="text">
+		<form action="" method="POST" name="create">
+			{{form.players}}
+			{{form.hidden_tag()}}
+
+			<div style="padding-top: 20px; padding-bottom: 20px;">
+				<div class="wide right">{{form.name}}</div>
+				<div class="narrow left">{{form.name.label}}</div>
+				<table id="player_list"></table>
+				<div class="narrow right"><a href="javascript:add()">Add Player</a></div>
+				<div class="wide left">{{form.add}}</div>
+			</div>
+
+			<div style="text-align: center;">
+				<input type="submit"/><input id="reset" type="reset"/>
+			</div>
+		</form>
+	</div>
+	<div class="back">
+		<a href="{{url_for("suspend")}}">Cancel</a>
+	</div>
+{% endblock %}
+

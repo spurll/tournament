@@ -32,8 +32,8 @@ from table import table, menu
 from player import Player
 
 
-DEFAULT_PLAYERS = {"Gem", "Curt", "Matt", "Cozmin", "Eric", "Brendan",
-                   "Dustin", "Dale", "Bhavek", "Mike", "Aron", "Nick"}
+DEFAULT_PLAYERS = {"Gem", "Curt", "Eric", "Brendan", "Dustin", "Mike", "Aron",
+                   "Nick"}
 
 DEFAULT_STRING = "Richard Garfield"
 BYE = Player("BYE", is_bye_player=True)

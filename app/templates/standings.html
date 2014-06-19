@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		<table>
+			<tr>
+				<th>Rank</th>
+				<th>Player</th>
+				<th>Points</th>
+				<th>TB1</th>
+				<th>TB2</th>
+				<th>TB3</th>
+				<th></th>
+			</tr>
+			{% for player in players %}
+				<tr>
+					<td>{{loop.index}}</td>
+					<td>{{player.name}}</td>
+					<td>{{player.points()}}</td>
+					<td>{{"{:.2f}".format(player.tb_1())}}</td>
+					<td>{{"{:.2f}".format(player.tb_2())}}</td>
+					<td>{{"{:.2f}".format(player.tb_3())}}</td>
+					{% if player.active %}
+						<td></td>
+					{% else %}
+						<td><i>D</i></td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div class="back">
+		<a href="{{url_for('main_menu')}}">Main Menu</a>
+	</div>
+{% endblock %}
+

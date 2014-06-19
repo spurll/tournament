@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		<table>
+			<tr>
+				<th>Table</th>
+				<th>Seat 1</th>
+				<th>Seat 2</th>
+				<th>Results</th>
+				<th></th>
+			</tr>
+			{% for match in matches %}
+				<tr>
+					<td>{{match.table_number}}</td>
+					{% if match.reported() %}
+						<td class="reported">
+					{% else %}
+						<td>
+					{% endif %}
+					{{match.seat_1.name}}</td>
+
+					{% if match.reported() %}
+						<td class="reported">
+					{% else %}
+						<td>
+					{% endif %}
+					{% if match.seat_2 %}
+						{{match.seat_2.name}}</td>
+					{% else %}
+						<i>&mdash;BYE&mdash;</i></td>
+					{% endif %}
+
+					<td>
+						{% if match.reported() %}
+							{{match.seat_1_wins}} &ndash; {{match.seat_2_wins}}
+							{% if match.draws %}&ndash; {{match.draws}}{% endif %}
+						{% endif %}
+					</td>
+
+					<td><a href="{{url_for('report_match', match=match.id)}}">
+						{% if not match.reported() %}
+							Report
+						{% elif match.seat_2 %}
+							Edit
+						{% endif %}
+					</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div class="back">
+		<a href="{{url_for('main_menu')}}">Main Menu</a>
+	</div>
+{% endblock %}
+

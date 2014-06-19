@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		{% for table in tables %}
+			<div class="heading">Table {{loop.index}}</div>
+			<ol>
+				{% for player in table %}
+					<li>{{player.name}}</li>
+				{% endfor %}
+			</ol>
+		{% endfor %}
+	</div>
+	<div class="back">
+		<a href="{{url_for('main_menu')}}">Main Menu</a>
+	</div>
+{% endblock %}
+

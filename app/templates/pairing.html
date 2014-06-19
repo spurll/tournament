@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		<table>
+			<tr>
+				<th>Table</th>
+				<th>Seat 1</th>
+				<th>Seat 2</th>
+			</tr>
+			{% for match in matches %}
+				<tr>
+					<td>{{match.table_number}}</td>
+					<td>{{match.seat_1.name}}</td>
+					{% if match.seat_2 %}
+						<td>{{match.seat_2.name}}</td>
+					{% else %}
+						<td><i>&mdash;BYE&mdash;</i></td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div class="back">
+		<a href="{{url_for('main_menu')}}">Main Menu</a>
+	</div>
+{% endblock %}
+
