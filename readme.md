@@ -1,15 +1,23 @@
 Overview
 ========
 
-tournament.py
--------------
-
 A web program (with a Flask and SQLite back-end) that facilitates a Magic: The Gathering limited tournament (sealed or draft). Players are randomized, seated, and paired. Match results are recorded, standings may be displayed, etc. Any given user can run (and suspend) multiple tournaments.
 
 Installation
 ============
 
+Instructions
+------------
+
 The config.py file contains values for HOST and SERVER_NAME for local testing and for running deployed on your own server. Comment out the appropriate line (and, if deploying, edit the SERVER_NAME appropriately). Make note of the PORT number specified, as this is also required to connect. Then simply execute run.py.
+
+Requirements
+------------
+
+* flask
+* flask-login
+* sqlalchemy 0.9+
+* python-ldap
 
 Bugs and Feature Requests
 =========================

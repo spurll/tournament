@@ -1,12 +1,13 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
-
 from math import floor, ceil
 from random import shuffle
+import ldap
 
-from app import app, db, lm, oid
+from app import app, db, lm
 from forms import LoginForm, CreateForm, ReportForm
 from models import User, Tournament, Round, Match, Player
+from authenticate import authenticate
 
 
 @app.route('/')
@@ -177,8 +178,9 @@ def seat_players():
     for t in xrange(table_count):
         for s in xrange(table_size):
             index = (t * table_size) + s
-            if index <= len(active):
+            if index < len(active):
                 # Update player objects.
+                print "Index: {}".format(index)
                 active[index].table = t + 1
                 active[index].seat = s + 1
             else:
@@ -485,17 +487,41 @@ def close_tournament():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-@oid.loginhandler
 def login():
     if g.user is not None and g.user.is_authenticated():
         return redirect(url_for('index'))
+
     form = LoginForm()
+
+    if request.method == 'GET':
+        return render_template('login.html', title="Log In", form=form)
+
     if form.validate_on_submit():
-        session['remember_me'] = form.remember_me.data
-        return oid.try_login(form.openid.data, ask_for=['nickname', 'email'])
-    return render_template('login.html', title='Log In', form=form, round=None,
-                           providers=app.config['OPENID_PROVIDERS'],
-                           num_providers=len(app.config['OPENID_PROVIDERS']))
+        username = form.username.data
+        password = form.password.data
+
+        try:
+            print "Logging in..."
+            user = authenticate(username, password)
+        except ldap.INVALID_CREDENTIALS:
+            user = None
+
+        if not user:
+            print "Login failed."
+            flash("Login failed.")
+            return render_template('login.html', title="Log In", form=form)
+
+        if user and user.is_authenticated():
+            db_user = User.query.get(user.id)
+            if db_user is None:
+                db.session.add(user)
+                db.session.commit()
+
+            login_user(user, remember=form.remember.data)
+
+            return redirect(request.args.get('next') or url_for('index'))
+
+    return render_template('login.html', title="Log In", form=form)
 
 
 @app.route('/logout')
@@ -515,7 +541,7 @@ def clear():
 
 @lm.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return User.query.get(id)
 
 
 @app.before_request
@@ -525,27 +551,6 @@ def before_request():
         session["tournament"] = None
     g.tournament = Tournament.query.get(session["tournament"]) \
                    if session["tournament"] else None
-
-
-@oid.after_login
-def after_login(resp):
-    if resp.email is None or resp.email == "":
-        flash('Invalid login. Please try again.')
-        return redirect(url_for('login'))
-    user = User.query.filter_by(email=resp.email).first()
-    if user is None:
-        name = resp.nickname
-        if name is None or name == "":
-            name = resp.email.split('@')[0]
-        user = User(name=name, email=resp.email)
-        db.session.add(user)
-        db.session.commit()
-    remember_me = False
-    if 'remember_me' in session:
-        remember_me = session['remember_me']
-        session.pop('remember_me', None)
-    login_user(user, remember=remember_me)
-    return redirect(request.args.get('next') or url_for('index'))
 
 
 def clear_tournaments():
@@ -607,3 +612,40 @@ def rank(p):
     rank += p.tb_2() / 10000        #       100
     rank += p.tb_3() / 10000000     #          090
     return rank                     # 12.03310009
+
+
+#@app.route('/login', methods=['GET', 'POST'])
+#@oid.loginhandler
+#def login():
+#    if g.user is not None and g.user.is_authenticated():
+#        return redirect(url_for('index'))
+#    form = LoginForm()
+#    if form.validate_on_submit():
+#        session['remember_me'] = form.remember_me.data
+#        return oid.try_login(form.openid.data, ask_for=['nickname', 'email'])
+#    return render_template('login.html', title='Log In', form=form, round=None,
+#                           providers=app.config['OPENID_PROVIDERS'],
+#                           num_providers=len(app.config['OPENID_PROVIDERS']))
+
+
+#@oid.after_login
+#def after_login(resp):
+#    if resp.email is None or resp.email == "":
+#        flash('Invalid login. Please try again.')
+#        return redirect(url_for('login'))
+#    user = User.query.filter_by(email=resp.email).first()
+#    if user is None:
+#        name = resp.nickname
+#        if name is None or name == "":
+#            name = resp.email.split('@')[0]
+#        user = User(name=name, email=resp.email)
+#        db.session.add(user)
+#        db.session.commit()
+#    remember_me = False
+#    if 'remember_me' in session:
+#        remember_me = session['remember_me']
+#        session.pop('remember_me', None)
+#    login_user(user, remember=remember_me)
+#    return redirect(request.args.get('next') or url_for('index'))
+
+

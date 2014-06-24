@@ -1,12 +1,13 @@
 from flask.ext.wtf import Form
-from wtforms import TextField, BooleanField, HiddenField
+from wtforms import TextField, BooleanField, HiddenField, PasswordField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import Required, NumberRange
 
 
 class LoginForm(Form):
-    openid = TextField("openid", validators=[Required()])
-    remember_me = BooleanField("remember_me", default=False)
+    username = TextField("Username", validators=[Required()])
+    password = PasswordField("Password", validators=[Required()])
+    remember = BooleanField("Remember Me", default=False)
 
 
 class CreateForm(Form):

@@ -1,38 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-	<script type="text/javascript">
-		function set_openid(openid, pr)
-		{
-			u = openid.search('<username>')
-			if (u != -1)
-			{
-				user = prompt('Enter your ' + pr + ' username:')
-				openid = openid.substr(0, u) + user
-			}
-			form = document.forms['login'];
-			form.elements['openid'].value = openid
-		}
-	</script>
+	<div class="text">
+		<form action="" method="POST" name="login">
+			{{form.hidden_tag()}}
 
-	<form action="" method="POST" name="login">
-		{{form.hidden_tag()}}
-		<div style="margin-top: 20px; height: 20px">
-			{% for pr in providers %}
-				<div style="width: {{1/num_providers*100}}%; text-align: center; float: left;">
-					<a href="javascript:set_openid('{{pr.url}}', '{{pr.name}}');">{{pr.name}}</a>
-				</div>
-			{% endfor %}
-		</div>
-
-		<div style="margin-top: 20px; height: 50px">
-			Alternatively, you can enter your OpenID manually:
-			<div style="float: left">{{form.openid(size=60)}}</div>
-			<div style="float: right; text-align: right"><input type="submit" value="Log In"></div>
-		</div>
-		<div style="float: left; height: 30px; width: 100%">{{form.remember_me}} Keep me logged in for the foreseeable future</div>
-
-		{% for error in form.errors.openid %}
-			<i>[{{error}}]</i>
-		{% endfor %}
-	</form>
+			<!--<div style="margin-top: 20px; height: 50px">-->
+				<div class="wide right" style="height: 30px;">{{form.username}}</div>
+				<div class="narrow left" style="height: 30px;">{{form.username.label}}</div>
+				<div class="wide right" style="height: 30px;">{{form.password}}</div>
+				<div class="narrow left" style="height: 30px;">{{form.password.label}}</div>
+				<div class="wide right"><input type="submit" value="Log In"></div>
+				<div class="narrow left">{{form.remember}} {{form.remember.label}}</div>
+			<!--</div>-->
+		</form>
+	</div>
 {% endblock %}
