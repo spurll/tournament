@@ -17,11 +17,14 @@ class User(db.Model):
     def is_anonymous(self):
         return False
 
+    def is_admin(self):
+        return self.id in app.config["ADMIN_USERS"]
+
     def get_id(self):
         return unicode(self.id)
 
     def __repr__(self):
-        return '<User {}>'.format(self.name)
+        return '<User {}>'.format(self.id)
 
 
 # Each tournament contains a list of players and a number of rounds.

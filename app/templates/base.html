@@ -23,12 +23,14 @@
 			a:hover { text-decoration: none; color: #ffffff; }
 			a:active { text-decoration: none; color: #888888; }
 
-			input[type="text"] { width: 100%; }
 			body { color: #ffffff; background-color: #000000; overflow-y:auto; }
-			p { margin: 5px; text-align: center }
 			table { width: 100%; margin-top: 5px; margin-bottom: 10px; }
-			input { color: #000000; }
+			p { margin: 5px; text-align: center }
 			th { text-align: left; font-variant: small-caps; }
+
+			input[type="text"] { width: 100%; }
+			input[type="password"] { width: 100%; }
+			input { color: #000000; }
 		</style>
 		<link rel="shortcut icon" href="static/icon.png"/>
     </head>
@@ -37,7 +39,7 @@
 		{% if user %}
 			<div class="user">
 				Logged in as {{user.name}}. <a href="{{ url_for('logout') }}">Log out.</a>
-				{% if user.admin %}
+				{% if user.is_admin() %}
 					<br/><a href="{{ url_for('clear') }}">Delete All Tournaments</a>
 				{% endif %}
 			</div>

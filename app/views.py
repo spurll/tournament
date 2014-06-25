@@ -534,7 +534,7 @@ def logout():
 @login_required
 def clear():
     user = g.user
-    if user.admin:
+    if user.is_admin():
         clear_tournaments()
     return redirect(url_for('index'))
 
@@ -612,40 +612,4 @@ def rank(p):
     rank += p.tb_2() / 10000        #       100
     rank += p.tb_3() / 10000000     #          090
     return rank                     # 12.03310009
-
-
-#@app.route('/login', methods=['GET', 'POST'])
-#@oid.loginhandler
-#def login():
-#    if g.user is not None and g.user.is_authenticated():
-#        return redirect(url_for('index'))
-#    form = LoginForm()
-#    if form.validate_on_submit():
-#        session['remember_me'] = form.remember_me.data
-#        return oid.try_login(form.openid.data, ask_for=['nickname', 'email'])
-#    return render_template('login.html', title='Log In', form=form, round=None,
-#                           providers=app.config['OPENID_PROVIDERS'],
-#                           num_providers=len(app.config['OPENID_PROVIDERS']))
-
-
-#@oid.after_login
-#def after_login(resp):
-#    if resp.email is None or resp.email == "":
-#        flash('Invalid login. Please try again.')
-#        return redirect(url_for('login'))
-#    user = User.query.filter_by(email=resp.email).first()
-#    if user is None:
-#        name = resp.nickname
-#        if name is None or name == "":
-#            name = resp.email.split('@')[0]
-#        user = User(name=name, email=resp.email)
-#        db.session.add(user)
-#        db.session.commit()
-#    remember_me = False
-#    if 'remember_me' in session:
-#        remember_me = session['remember_me']
-#        session.pop('remember_me', None)
-#    login_user(user, remember=remember_me)
-#    return redirect(request.args.get('next') or url_for('index'))
-
 
