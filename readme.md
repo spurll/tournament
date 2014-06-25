@@ -9,13 +9,15 @@ Installation
 Instructions
 ------------
 
-The config.py file contains values for HOST and SERVER_NAME for local testing and for running deployed on your own server. Comment out the appropriate line (and, if deploying, edit the SERVER_NAME appropriately). Make note of the PORT number specified, as this is also required to connect. Before running for the first time, run db_create.py. Then simply execute run.py.
+Before running for the first time, run db_create.py. Then simply execute run.py.
 
 Requirements
 ------------
 
 * flask
 * flask-login
+* flask-wtf
+* flask-sqlalchemy
 * sqlalchemy
 * python-ldap
 
