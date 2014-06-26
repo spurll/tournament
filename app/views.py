@@ -16,11 +16,13 @@ def index():
     return redirect(url_for("list_tournaments"))
 
 
-# Lists all tournaments for the user and allows the user to create, delete or
-# resume one.
 @app.route('/list')
 @login_required
 def list_tournaments():
+    """
+    Lists all tournaments for the user and allows the user to create, delete or
+    resume one.
+    """
     user = g.user
     tournaments = User.query.get(user.id).tournaments.order_by( \
                   Tournament.id.desc())
@@ -32,11 +34,13 @@ def list_tournaments():
                            tournaments=tournaments, round=None)
 
 
-# Gets a list of players, initializes the tournament, sets it as the current
-# tournament, then passes control to the tournament main menu.
 @app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_tournament():
+    """
+    Gets a list of players, initializes the tournament, sets it as the current
+    tournament, then passes control to the tournament main menu.
+    """
     form = CreateForm()
 
     if form.is_submitted():
@@ -74,11 +78,13 @@ def create_tournament():
                            round=None)
 
 
-# Sets the current tournament to the specified ID and passes control to the
-# tournament main menu.
 @app.route('/resume', methods=['GET'])
 @login_required
 def resume_tournament():
+    """
+    Sets the current tournament to the specified ID and passes control to the
+    tournament main menu.
+    """
     id = request.args.get("id", "")
     tournament = validate_tournament(id)
 
@@ -89,11 +95,13 @@ def resume_tournament():
         return redirect(url_for("index"))
 
 
-# Deletes the specified tournament from the DB then returns to the tournament
-# list.
 @app.route('/delete', methods=['GET'])
 @login_required
 def delete_tournament():
+    """
+    Deletes the specified tournament from the DB then returns to the tournament
+    list.
+    """
     id = request.args.get("id", "")
     tournament = validate_tournament(id)
 
@@ -110,18 +118,22 @@ def delete_tournament():
     return redirect(url_for("index"))
 
 
-# Suspends the tournament and returns control to the tournament list.
 @app.route('/suspend')
 @login_required
 def suspend():
+    """
+    Suspends the tournament and returns control to the tournament list.
+    """
     session["tournament"] = None
     return redirect(url_for("index"))
 
 
-# Main menu for the tournament.
 @app.route('/tournament')
 @login_required
 def main_menu():
+    """
+    Main menu for the tournament.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -155,10 +167,12 @@ def main_menu():
                            reporting=reporting, reported=reported)
 
 
-# Seating players assigns a seat and table number to them.
 @app.route('/seat')
 @login_required
 def seat_players():
+    """
+    Seating players assigns a seat and table number to them.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -193,6 +207,9 @@ def seat_players():
 @app.route('/seating')
 @login_required
 def view_seats():
+    """
+    Displays assigned seating.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -217,12 +234,14 @@ def view_seats():
                            tables=tables, round=None)
 
 
-# Pairing players adds a round to the tournament and pairs with an opponent.
-# Ensure that once reporting has begun, players cannot be re-paired (unreported
-# players must either report or be dropped).
 @app.route('/pair')
 @login_required
 def pair_players():
+    """
+    Pairing players adds a round to the tournament and pairs with an opponent.
+    Ensure that once reporting has begun, players cannot be re-paired
+    (unreported players must either report or drop).
+    """
     user = g.user
     tournament = g.tournament
 
@@ -294,7 +313,7 @@ def pair_players():
 
             if bye_player:
                 # BYE
-                match = create_match(active[i], None, table)
+                match = create_match(bye_player, None, table)
                 round.matches.append(match)
 
     # Pair based upon points.
@@ -343,6 +362,9 @@ def pair_players():
 @app.route('/pairings')
 @login_required
 def view_pairs():
+    """
+    Displays assigned match pairings.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -362,12 +384,20 @@ def view_pairs():
 @app.route('/editpair')
 @login_required
 def edit_pairings():
+    """
+    Allows the tournament organizer to edit pairings, because our algorithm
+    isn't very good.
+    """
     return redirect(url_for('main_menu'))
 
 
 @app.route('/report')
 @login_required
 def report_results():
+    """
+    Displays pairings and allows the tournament organizer to report wins,
+    losses, and draws for all matches in the current round.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -387,6 +417,9 @@ def report_results():
 @app.route('/match', methods=['GET', 'POST'])
 @login_required
 def report_match():
+    """
+    Handles the reporting of a given match.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -449,6 +482,9 @@ def report_match():
 @app.route('/standings')
 @login_required
 def standings():
+    """
+    Displays current tournament standings.
+    """
     user = g.user
     tournament = g.tournament
 
@@ -468,13 +504,85 @@ def standings():
 @app.route('/stats')
 @login_required
 def player_stats():
-    # Select player. For each match (in order), print detailed results.
-    return redirect(url_for('main_menu'))
+    """
+    Displays detailed player stats.
+    """
+    user = g.user
+    tournament = g.tournament
+
+    if not tournament:
+        return redirect(url_for("list_tournaments"))
+
+    if not tournament.current_round():
+        return redirect(url_for("main_menu"))
+
+    players = tournament.players
+    title = "Detailed Player Statistics"
+    round = tournament.current_round().round_number
+    return render_template("select.html", title=title, user=user, round=round,
+                           players=players, next="player_details")
+
+
+@app.route('/details', methods=['GET'])
+@login_required
+def player_details():
+    """
+    Displays detailed stats for a given player.
+    """
+    user = g.user
+    tournament = g.tournament
+
+    if not tournament:
+        return redirect(url_for("list_tournaments"))
+
+    if not tournament.current_round():
+        return redirect(url_for("main_menu"))
+
+    id = request.args.get("player")
+    if id:
+        player = [p for p in tournament.players if p.id == int(id)][0]
+    else:
+        flash("No player specified.")
+        return redirect(url_for("player_stats"))
+
+    matches = sorted(player.matches(), key=lambda m: m.round.round_number)
+
+    match_details = []
+    for m in matches:
+        if m.reported():
+            if m.seat_1 is player:
+                details = {"opponent": m.seat_2.name if m.seat_2 else None,
+                           "result": "Draw",
+                           "wins": m.seat_1_wins,
+                           "losses": m.seat_2_wins,
+                           "draws": m.draws}
+            else:
+                details = {"opponent": m.seat_1.name if m.seat_1 else None,
+                           "result": "Draw",
+                           "wins": m.seat_2_wins,
+                           "losses": m.seat_1_wins,
+                           "draws": m.draws}
+
+            if details["wins"] > details["losses"]:
+                details["result"] = "Won!"
+            elif details["wins"] < details["losses"]:
+                details["result"] = "Lost!"
+
+            match_details.append(details)
+
+    title = "Statistics for {}".format(player.name)
+    round = tournament.current_round().round_number
+    return render_template("stats.html", title=title, user=user, round=round,
+                           player=player, matches=match_details)
 
 
 @app.route('/drop')
 @login_required
 def drop_player():
+    """
+    Drops a player from the tournament.
+    """
+
     # If the player is in a match (that hasn't been reported yet), remove them.
     # (Becomes a BYE.)
     return redirect(url_for('main_menu'))
@@ -483,11 +591,17 @@ def drop_player():
 @app.route('/close')
 @login_required
 def close_tournament():
+    """
+    Displays final stats, then deletes the tournament.
+    """
     return redirect(url_for('main_menu'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Logs the user in using LDAP authentication.
+    """
     if g.user is not None and g.user.is_authenticated():
         return redirect(url_for('index'))
 
@@ -533,6 +647,9 @@ def logout():
 @app.route('/clear')
 @login_required
 def clear():
+    """
+    Allows administrators to delete all tournaments from the DB.
+    """
     user = g.user
     if user.is_admin():
         clear_tournaments()
@@ -586,14 +703,16 @@ def number_of_tables(player_count):
     each as possible.
     """
     target = app.config["IDEAL_TABLE"]
-    tables = range(1, player_count + 1)
-    diff = [abs(floor(player_count / i) - target) for i in tables]
+    possible_tables = range(1, player_count + 1)
+    diff = [abs(floor(player_count / i) - target) for i in possible_tables]
     return int(diff.index(min(diff))) + 1
 
 
 def create_match(player, opponent, table_number):
-    match = Match(seat_1=player, seat_2=opponent,
-                  table_number=table_number)
+    """
+    Creates a match object with the two specified players.
+    """
+    match = Match(seat_1=player, seat_2=opponent, table_number=table_number)
 
     player.seat = 1
     player.table = table_number
@@ -606,6 +725,10 @@ def create_match(player, opponent, table_number):
 
 
 def rank(p):
+    """
+    A key function that allows players to be sorted in rank order.
+    """
+
     # Example: 12 points, with tie-breakers of 0.33, 1.00, and 0.90 becomes...
     rank = p.points()               # 12.
     rank += p.tb_1() / 10           #    033

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		<div class="section"><p>Select a Player</p></div>
+		<div class="section">
+			{% for p in players %}
+			<p><a href="{{url_for(next, player=p.id)}}">{{p.name}}</a></p>
+			{% endfor %}
+		</div>
+	</div>
+	<div class="back">
+		<a href="{{url_for('main_menu')}}">Main Menu</a>
+	</div>
+{% endblock %}
+

@@ -11,7 +11,8 @@ class LoginForm(Form):
 
 
 class CreateForm(Form):
-    name = TextField(label="Tournament Name", validators=[Required()])
+    name = TextField(label="Tournament Name", default="Tournament",
+                     validators=[Required()])
     players = HiddenField(label="Players", validators=[Required()])
     add = TextField(label="Add Player")
 

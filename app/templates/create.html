@@ -3,9 +3,6 @@
 	<script type="text/javascript" src="static/jquery-2.1.1.js"></script>
 	<script type="text/javascript">
 		$( document ).ready(function() {
-			// Start focus on the tournament name field.
-			$("#name").focus();
-
 			// Populate any names that exist in the hidden field on page load.
 			var names = $("#players").val().split("|");
 			for (var i = 0; i < names.length; i++) {
@@ -90,7 +87,7 @@
 				<div class="narrow left">{{form.name.label}}</div>
 				<table id="player_list"></table>
 				<div class="narrow right"><a href="javascript:add()">Add Player</a></div>
-				<div class="wide left">{{form.add}}</div>
+				<div class="wide left">{{form.add(autofocus=True)}}</div>
 			</div>
 
 			<div style="text-align: center;">
