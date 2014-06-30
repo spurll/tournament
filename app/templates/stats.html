@@ -2,10 +2,11 @@
 {% block content %}
 	<div class="text">
 		<table>
+			<tr><td>Player:</td><td>{{player.name}}</td></tr>
 			{% if not player.active %}
 				<tr><td colspan=2><b>Dropped</b></td></tr>
-				<tr><td colspan=2>&nbsp;</td></tr>
 			{% endif %}
+			<tr><td colspan=2>&nbsp;</td></tr>
 
 			<tr><td>Points:</td><td>{{player.points()}}</td></tr>
 			<tr><td>Opponents' Match Record:</td><td>{{player.op_match_win_percentage()}}</td></tr>

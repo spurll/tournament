@@ -18,18 +18,22 @@
 		</div>
 
 		<div class="section">
-			{% if not paired %}
+			{% if seated and not paired %}
 				<p><a href="{{url_for('view_seats')}}">View Seating</a></p>
-			{% else %}
+			{% elif paired %}
 				<p><a href="{{url_for('view_pairs')}}">View Pairings</a></p>
 			{% endif %}
 			<p><a href="{{url_for('standings')}}">View Standings</a></p>
-			<p><a href="{{url_for('player_stats')}}">View Player Stats</a></p>
+			{% if round %}
+				<p><a href="{{url_for('player_stats')}}">View Player Stats</a></p>
+			{% endif %}
 		</div>
 
 		<div class="section">
 			<p><a href="{{url_for('drop_player')}}">Drop Player</a></p>
-			<p><a href="{{url_for('close_tournament')}}">Close Tournament</a></p>
+			{% if reported %}
+				<p><a href="{{url_for('close_tournament')}}">Close Tournament</a></p>
+			{% endif %}
 		</div>
 	</div>
 	<div class="back">

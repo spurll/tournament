@@ -27,9 +27,21 @@
 				</tr>
 			{% endfor %}
 		</table>
+
+		{% if close %}
+			<div class="section"><p>
+				<a href="{{url_for('delete_tournament', id=close)}}">Close Tournament</a>
+			</p></div>
+		{% endif %}
 	</div>
 	<div class="back">
-		<a href="{{url_for('main_menu')}}">Main Menu</a>
+		<a href="{{url_for('main_menu')}}">
+			{% if close %}
+				Cancel
+			{% else %}
+				Main Menu
+			{% endif %}
+		</a>
 	</div>
 {% endblock %}
 

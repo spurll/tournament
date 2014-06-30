@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-	<script type="text/javascript" src="static/jquery-2.1.1.js"></script>
+	<script type="text/javascript" src="/static/jquery-2.1.1.js"></script>
 	<script type="text/javascript">
 		$( document ).ready(function() {
 			// Populate any names that exist in the hidden field on page load.
@@ -10,21 +10,23 @@
 			}
 
 			// Add a handler to catch any ENTER keypresses.
-			$("#add").keypress(function(event) {
-				if (event.which == 13 || event.keyCode == 13) {
-					event.preventDefault();
-					add();
+			$("#add").keypress(function(e) {
+				if (e.which == 13 || e.keyCode == 13) {
+					if ($("#add").val()) {
+						e.preventDefault();
+						add();
+					}
 				}
 			});
 
-			$("#name").keypress(function(event) {
-				if (event.which == 13 || event.keyCode == 13) {
-					event.preventDefault();
+			$("#name").keypress(function(e) {
+				if (e.which == 13 || e.keyCode == 13) {
+					e.preventDefault();
 					$("#add").focus();
 				}
 			});
 
-			$("#reset").click(function(event) {
+			$("#reset").click(function(e) {
 				var names = $("#players").val().split("|");
 				for (var i = 0; i < names.length; i++) {
 					remove(names[i]);

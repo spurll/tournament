@@ -16,7 +16,7 @@ def index():
     return redirect(url_for("list_tournaments"))
 
 
-@app.route('/list')
+@app.route('/tournament/list')
 @login_required
 def list_tournaments():
     """
@@ -34,7 +34,7 @@ def list_tournaments():
                            tournaments=tournaments, round=None)
 
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/tournament/create', methods=['GET', 'POST'])
 @login_required
 def create_tournament():
     """
@@ -78,7 +78,7 @@ def create_tournament():
                            round=None)
 
 
-@app.route('/resume', methods=['GET'])
+@app.route('/tournament/resume', methods=['GET'])
 @login_required
 def resume_tournament():
     """
@@ -95,7 +95,7 @@ def resume_tournament():
         return redirect(url_for("index"))
 
 
-@app.route('/delete', methods=['GET'])
+@app.route('/tournament/delete', methods=['GET'])
 @login_required
 def delete_tournament():
     """
@@ -118,7 +118,7 @@ def delete_tournament():
     return redirect(url_for("index"))
 
 
-@app.route('/suspend')
+@app.route('/tournament/suspend')
 @login_required
 def suspend():
     """
@@ -204,7 +204,7 @@ def seat_players():
     return redirect(url_for("view_seats"))
 
 
-@app.route('/seating')
+@app.route('/view/seating')
 @login_required
 def view_seats():
     """
@@ -359,7 +359,7 @@ def pair_players():
     return redirect(url_for("view_pairs"))
 
 
-@app.route('/pairings')
+@app.route('/view/pairings')
 @login_required
 def view_pairs():
     """
@@ -381,7 +381,7 @@ def view_pairs():
                            round=round.round_number, matches=matches)
 
 
-@app.route('/editpair')
+@app.route('/edit/pairings')
 @login_required
 def edit_pairings():
     """
@@ -414,7 +414,7 @@ def report_results():
                            round=round.round_number, matches=matches)
 
 
-@app.route('/match', methods=['GET', 'POST'])
+@app.route('/report/match', methods=['GET', 'POST'])
 @login_required
 def report_match():
     """
@@ -479,7 +479,7 @@ def report_match():
                            round=round.round_number, match=match, form=form)
 
 
-@app.route('/standings')
+@app.route('/view/standings')
 @login_required
 def standings():
     """
@@ -491,17 +491,17 @@ def standings():
     if not tournament:
         return redirect(url_for("list_tournaments"))
 
-    if not tournament.current_round():
-        return redirect(url_for("main_menu"))
+    round = tournament.current_round()
+    if round:
+        round = round.round_number
 
     title = "Standings"
-    round = tournament.current_round().round_number
     players = sorted(tournament.players.all(), key=rank, reverse=True)
     return render_template("standings.html", title=title, user=user,
-                           round=round, players=players)
+                           round=round, players=players, close=False)
 
 
-@app.route('/stats')
+@app.route('/view/stats')
 @login_required
 def player_stats():
     """
@@ -523,7 +523,7 @@ def player_stats():
                            players=players, next="player_details")
 
 
-@app.route('/details', methods=['GET'])
+@app.route('/view/details', methods=['GET'])
 @login_required
 def player_details():
     """
@@ -582,19 +582,58 @@ def drop_player():
     """
     Drops a player from the tournament.
     """
+    user = g.user
+    tournament = g.tournament
+
+    if not tournament:
+        return redirect(url_for("list_tournaments"))
+
+    id = request.args.get("player")
+    if id:
+        player = [p for p in tournament.players if p.id == int(id)][0]
+        if not player.current_match() or player.current_match().reported():
+            flash("{} dropped.".format(player.name))
+            player.active = False
+            db.session.commit()
+        else:
+            flash("Unable to drop {}: match results must be reported first."
+                  .format(player.name))
+
+    round = tournament.current_round()
+    if round:
+        round = round.round_number
+
+    players = tournament.active_players()
+    title = "Drop Players"
+    return render_template("select.html", title=title, user=user, round=round,
+                           players=players, next="drop_player")
+
 
     # If the player is in a match (that hasn't been reported yet), remove them.
     # (Becomes a BYE.)
     return redirect(url_for('main_menu'))
 
 
-@app.route('/close')
+@app.route('/tournament/close')
 @login_required
 def close_tournament():
     """
     Displays final stats, then deletes the tournament.
     """
-    return redirect(url_for('main_menu'))
+    user = g.user
+    tournament = g.tournament
+
+    if not tournament:
+        return redirect(url_for("list_tournaments"))
+
+    if not tournament.current_round():
+        return redirect(url_for("main_menu"))
+
+    title = "Final Standings"
+    round = tournament.current_round().round_number
+    players = sorted(tournament.players.all(), key=rank, reverse=True)
+    return render_template("standings.html", title=title, user=user,
+                           round=round, players=players, close=tournament.id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -644,7 +683,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/clear')
+@app.route('/tournament/clear')
 @login_required
 def clear():
     """
