@@ -8,11 +8,6 @@
 #   An "undo" fuction would be fairly trivial (and useful!) to implement!
 #   Just keep a deep copy of the players set!
 #
-#   Make this a webPy thing.
-#
-#   Add full logging, including the IP address of whomever connects (for
-#   stats-gathering purposes).
-#
 #   Should walk a tree and find optimal pairings among players, then randomly
 #   select between optimals.
 #

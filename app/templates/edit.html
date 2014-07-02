@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="text">
+		<div class="section">
+		{% if player %}
+			<p>Please select a new opponent for {{player.name}}.</p>
+		{% else %}
+			<p>Please select a player from the list below.</p>
+		{% endif %}
+		<div class="section">
+			<table>
+				<tr>
+					<th>Table</th>
+					<th>Seat 1</th>
+					<th>Seat 2</th>
+				</tr>
+				{% for match in matches %}
+					<tr>
+						<td>{{match.table_number}}</td>
+						{% for p in [match.seat_1, match.seat_2] %}
+							{% if p %}
+								<td>
+									{% if player %}
+										<a href="{{url_for('edit_pairings', player=player.id, opponent=p.id)}}">
+									{% else %}
+										<a href="{{url_for('edit_pairings', player=p.id)}}">
+									{% endif %}
+
+									{% if player == p %}
+										<span style="color: #ffffff">{{p.name}}</span>
+									{% else %}
+										{{p.name}}
+									{% endif %}
+								</a></td>
+							{% else %}
+								<td><i>&mdash;BYE&mdash;</i></td>
+							{% endif %}
+						{% endfor %}
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+	<div class="back">
+		<a href="{{url_for('main_menu')}}">Main Menu</a>
+	</div>
+{% endblock %}
+

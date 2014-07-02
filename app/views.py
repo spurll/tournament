@@ -1,4 +1,8 @@
-from flask import render_template, flash, redirect, session, url_for, request, g
+# Written by Gem Newman. This work is licensed under a Creative Commons         
+# Attribution-NonCommercial-ShareAlike 3.0 Unported License.                    
+
+
+from ilask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from math import floor, ceil
 from random import shuffle
@@ -24,7 +28,7 @@ def list_tournaments():
     resume one.
     """
     user = g.user
-    tournaments = User.query.get(user.id).tournaments.order_by( \
+    tournaments = User.query.get(user.id).tournaments.order_by(
                   Tournament.id.desc())
 
     if not tournaments:
@@ -388,7 +392,59 @@ def edit_pairings():
     Allows the tournament organizer to edit pairings, because our algorithm
     isn't very good.
     """
-    return redirect(url_for('main_menu'))
+    user = g.user
+    tournament = g.tournament
+
+    if not tournament:
+        return redirect(url_for("list_tournaments"))
+
+    if not tournament.paired():
+        return redirect(url_for("pair_players"))
+
+    round = tournament.current_round()
+    if round.reporting_begun():
+        flash("Unable to edit pairings after match results have been "
+              "reported.")
+        return redirect(url_for("main_menu"))
+
+    player = None
+    id = request.args.get("player")
+    if id:
+        try:
+            player = [p for p in tournament.players if p.id == int(id)][0]
+        except:
+            flash("Invalid player specified.")
+            return redirect(url_for("edit_pairings"))
+
+        opponent_id = request.args.get("opponent")
+        if opponent_id:
+            try:
+                opponent = [p for p in tournament.players
+                            if p.id == int(opponent_id)][0]
+            except:
+                flash("Invalid opponent specified.")
+                return redirect(url_for("edit_pairings"))
+
+            if player is opponent:
+                # De-select the player.
+                return redirect(url_for("edit_pairings"))
+
+            if player.opponent() is opponent:
+                flash("{} and {} are already paired.".format(player.name,
+                      opponent.name))
+                return redirect(url_for("edit_pairings"))
+
+            # Pair the player and the opponent.
+            swap_opponents(player, opponent)
+
+            # Clear the selected player so that we have a clean display.
+            player = None
+
+    title = "Edit Pairings"
+    matches = sorted(round.matches, key=lambda m: m.table_number)
+    return render_template("edit.html", title=title, user=user,
+                           round=round.round_number, matches=matches,
+                           player=player)
 
 
 @app.route('/report')
@@ -540,7 +596,11 @@ def player_details():
 
     id = request.args.get("player")
     if id:
-        player = [p for p in tournament.players if p.id == int(id)][0]
+        try:
+            player = [p for p in tournament.players if p.id == int(id)][0]
+        except:
+            flash("Invalid player specified.")
+            return redirect(url_for("player_stats"))
     else:
         flash("No player specified.")
         return redirect(url_for("player_stats"))
@@ -590,7 +650,12 @@ def drop_player():
 
     id = request.args.get("player")
     if id:
-        player = [p for p in tournament.players if p.id == int(id)][0]
+        try:
+            player = [p for p in tournament.players if p.id == int(id)][0]
+        except:
+            flash("Invalid player specified.")
+            return redirect(url_for("drop_player"))
+
         if not player.current_match() or player.current_match().reported():
             flash("{} dropped.".format(player.name))
             player.active = False
@@ -761,6 +826,47 @@ def create_match(player, opponent, table_number):
         opponent.table = table_number
 
     return match
+
+
+def swap_opponents(player_1, opponent_1):
+    """
+    Takes two players who are already paired with others and pairs them with
+    each other (pairing their former opponents as a result).
+    """
+    match_1 = player_1.current_match()
+    match_2 = opponent_1.current_match()
+
+    player_2 = player_1.opponent()
+    opponent_2 = opponent_1.opponent()
+
+    # Do the swap.
+    match_1.seat_1 = player_1
+    match_1.seat_2 = opponent_1
+
+    match_2.seat_1 = player_2
+    match_2.seat_2 = opponent_2
+
+    if not match_2.seat_1:
+        if match_2.seat_2:
+            # If match two has a BYE, ensure that the player is in seat 1.
+            print("The BYE is in seat one. Swapping...")
+            match_2.seat_1, match_2.seat_2 = match_2.seat_2, match_2.seat_1
+        else:
+            # If match two somehow ends up with two BYEs, delete it.
+            print("Both seats have a BYE. Deleting match...")
+            db.session.delete(match_2)
+            match_2 = None
+
+    db.session.commit()
+
+    flash("{} is now paired with {}.".format(match_1.seat_1.name,
+          match_1.seat_2.name))
+    if match_2:
+        if match_2.seat_2:
+            flash("As a result, {} is now paired with {}.".format(
+                  match_2.seat_1.name, match_2.seat_2.name))
+        else:
+            flash("As a result, {} now has a BYE.".format(match_2.seat_1.name))
 
 
 def rank(p):

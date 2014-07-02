@@ -27,26 +27,21 @@ Bugs and Feature Requests
 Feature Requests
 ----------------
 
-The current version is a "minimally viable product" that is missing some important features. The following features will be supported in future releases:
+The following features may be implemented in the future:
 
-* Editing player pairings (the existing algorithm for pairing isn't perfect).
-* Displaying detailed player stats.
-* Dropping players from the tournament.
-* Closing the tournament from the main menu.
+* An "undo" fuction would be fairly useful. A single-level undo probably wouldn't be too hard to implement.
+* Verification ("Are you sure?") for some of the more disastrous stuff you can do accidentally. (Dropping players, closing tournaments, etc.)
+* Logging, including the IP address of whomever connects (to satisfy my curiosity as to where people are connecting from).
 
-Additionally, the following features may be implemented in the future:
-
-* An "undo" fuction would be fairly trivial (and useful!) to implement! Just keep a deep copy of the players set!
-* Add verification for some of the bad stuff you can do accidentally. (Dropping players, etc.)
-* Add logging, including the IP address of whomever connects (to satisfy my curiosity as to where people are connecting from).
-
-The old (non-web) version of the program can be found in the old/ directory.
+An older, command-line version of the program can be found in the cli/ directory. It has most of the same features, but will probably not be updated in the future.
 
 Known Bugs
 ----------
 
 * Pairings can result in multiple byes if bottom-ranked players have already played each other.
 * Players can hypothetically achieve multiple byes (if the tournament goes long and they are once again the bottom-ranked player).
+
+Both of these bugs can be mitigated by manually re-pairing players using the "Edit Pairings" function.
 
 Tournament Rules
 ================
