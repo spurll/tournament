@@ -2,7 +2,7 @@
 # Attribution-NonCommercial-ShareAlike 3.0 Unported License.                    
 
 
-from ilask import render_template, flash, redirect, session, url_for, request, g
+from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from math import floor, ceil
 from random import shuffle
