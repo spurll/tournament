@@ -6,16 +6,17 @@
 
 from argparse import ArgumentParser
 
-from app import app, views
+from app import app
 
 
 if __name__ == '__main__':
     description = "Runs the Flask server for the Magic tournament program."
     parser = ArgumentParser(description=description)
-    parser.add_argument("-t", "--test", help="Changes host information to allow "
-                        "access via localhost.", action="store_true")
-    parser.add_argument("-n", "--nodebug", help="Turns off server debug settings, "
-                        "including the reloader.", action="store_true")
+    parser.add_argument("-t", "--test", help="Changes host information to "
+                        "allow access via localhost.", action="store_true")
+    parser.add_argument("-n", "--nodebug", help="Turns off server debug "
+                        "settings, including the reloader.",
+                        action="store_true")
     args = parser.parse_args()
 
     if args.test:
