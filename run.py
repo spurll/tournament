@@ -28,6 +28,6 @@ if __name__ == '__main__':
         app.config["SERVER_NAME"] = app.config["TEST_SERVER_NAME"]
         app.config["HOST"] = app.config["TEST_HOST"]
 
-    run_simple(app.config["HOST"], app.config["PORT"], app,
-               use_debugger=args.debug, use_reloader=args.reload)
+    app.run(app.config["HOST"], app.config["PORT"], use_debugger=args.debug,
+            use_reloader=args.reload)
 
