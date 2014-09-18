@@ -8,7 +8,7 @@ from math import floor, ceil
 from random import shuffle
 import ldap
 
-from app import app, db, lm
+from tournament import app, db, lm
 from forms import LoginForm, CreateForm, ReportForm
 from models import User, Tournament, Round, Match, Player
 from authenticate import authenticate
@@ -20,7 +20,7 @@ def index():
     return redirect(url_for("list_tournaments"))
 
 
-@app.route('/tournament/list')
+@app.route('/list')
 @login_required
 def list_tournaments():
     """
@@ -38,7 +38,7 @@ def list_tournaments():
                            tournaments=tournaments, round=None)
 
 
-@app.route('/tournament/create', methods=['GET', 'POST'])
+@app.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_tournament():
     """
@@ -82,7 +82,7 @@ def create_tournament():
                            round=None)
 
 
-@app.route('/tournament/resume', methods=['GET'])
+@app.route('/resume', methods=['GET'])
 @login_required
 def resume_tournament():
     """
@@ -99,7 +99,7 @@ def resume_tournament():
         return redirect(url_for("index"))
 
 
-@app.route('/tournament/delete', methods=['GET'])
+@app.route('/delete', methods=['GET'])
 @login_required
 def delete_tournament():
     """
@@ -122,7 +122,7 @@ def delete_tournament():
     return redirect(url_for("index"))
 
 
-@app.route('/tournament/suspend')
+@app.route('/suspend')
 @login_required
 def suspend():
     """
@@ -132,7 +132,7 @@ def suspend():
     return redirect(url_for("index"))
 
 
-@app.route('/tournament')
+@app.route('/main')
 @login_required
 def main_menu():
     """
@@ -208,7 +208,7 @@ def seat_players():
     return redirect(url_for("view_seats"))
 
 
-@app.route('/view/seating')
+@app.route('/view_seating')
 @login_required
 def view_seats():
     """
@@ -363,7 +363,7 @@ def pair_players():
     return redirect(url_for("view_pairs"))
 
 
-@app.route('/view/pairings')
+@app.route('/view_pairings')
 @login_required
 def view_pairs():
     """
@@ -385,7 +385,7 @@ def view_pairs():
                            round=round.round_number, matches=matches)
 
 
-@app.route('/edit/pairings')
+@app.route('/edit_pairings')
 @login_required
 def edit_pairings():
     """
@@ -470,7 +470,7 @@ def report_results():
                            round=round.round_number, matches=matches)
 
 
-@app.route('/report/match', methods=['GET', 'POST'])
+@app.route('/report_match', methods=['GET', 'POST'])
 @login_required
 def report_match():
     """
@@ -535,7 +535,7 @@ def report_match():
                            round=round.round_number, match=match, form=form)
 
 
-@app.route('/view/standings')
+@app.route('/standings')
 @login_required
 def standings():
     """
@@ -557,7 +557,7 @@ def standings():
                            round=round, players=players, close=False)
 
 
-@app.route('/view/stats')
+@app.route('/stats')
 @login_required
 def player_stats():
     """
@@ -579,7 +579,7 @@ def player_stats():
                            players=players, next="player_details")
 
 
-@app.route('/view/details', methods=['GET'])
+@app.route('/details', methods=['GET'])
 @login_required
 def player_details():
     """
@@ -679,7 +679,7 @@ def drop_player():
     return redirect(url_for('main_menu'))
 
 
-@app.route('/tournament/close')
+@app.route('/close')
 @login_required
 def close_tournament():
     """
@@ -748,7 +748,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/tournament/clear')
+@app.route('/clear')
 @login_required
 def clear():
     """

@@ -6,20 +6,27 @@
 
 from argparse import ArgumentParser
 
-from app import app, views
+from tournament import app
+import config_test
 
 
-description = "Runs the Flask server for the Magic tournament program."
-parser = ArgumentParser(description=description)
-parser.add_argument("-t", "--test", help="Changes host information to allow "
-                    "access via localhost.", action="store_true")
-parser.add_argument("-n", "--nodebug", help="Turns off server debug settings, "
-                    "including the reloader.", action="store_true")
-args = parser.parse_args()
+if __name__ == '__main__':
+    description = "Runs the Flask server for the Magic tournament program."
+    parser = ArgumentParser(description=description)
+    parser.add_argument("-t", "--test", help="Changes host information to "
+                        "allow access via localhost.", action="store_true")
+    parser.add_argument("-d", "--debug", help="Turns server debug mode on. "
+                        "(Not recommended for world-accesible servers!)",
+                        action="store_true")
+    parser.add_argument("-r", "--reload", help="Turns the automatic realoder "
+                        "on. This setting restarts the server whenever a "
+                        "change in the source is detected.",
+                        action="store_true")
+    args = parser.parse_args()
 
-if args.test:
-    app.config["SERVER_NAME"] = app.config["TEST_SERVER_NAME"]
-    app.config["HOST"] = app.config["TEST_HOST"]
+    if args.test:
+        app.config.from_object(config_test)
 
-app.run(app.config["HOST"], app.config["PORT"], debug=not args.nodebug)
+    app.run(app.config["HOST"], app.config["PORT"], use_debugger=args.debug,
+            use_reloader=args.reload)
 

@@ -1,6 +1,6 @@
 import ldap
 
-from app import app
+from tournament import app
 from models import User
 
 
@@ -25,6 +25,7 @@ def authenticate(username, password):
             id = entry['uid'][0]
 
             user = User(name=name, id=id, email=email)
+
     finally:
         connection.unbind_s()
         return user
