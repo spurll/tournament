@@ -1,5 +1,5 @@
-Overview
-========
+Tournament
+==========
 
 A web program (with a Flask and SQLite back-end) that facilitates a Magic: The Gathering limited tournament (sealed or draft). Players are randomized, seated, and paired. Match results are recorded, standings may be displayed, etc. Any given user can run (and suspend) multiple tournaments.
 
@@ -9,7 +9,7 @@ Installation
 Instructions
 ------------
 
-Before running for the first time, run db_create.py. Then simply execute run.py.
+Edit `config.py` and specify the desired hostname and port. Before running for the first time, run `db_create.py`. Then simply execute `run.py`. (By default, it will be externally accessible. For testing on localhost, use the `--test` flag.)
 
 Requirements
 ------------
@@ -46,13 +46,11 @@ Both of these bugs can be mitigated by manually re-pairing players using the "Ed
 Tournament Rules
 ================
 
-More information about byes, tiebreakers, etc. can be found here:
-http://www.wizards.com/ContentResources/Wizards/WPN/Main/Documents/Magic_The_Gathering_Tournament_Rules_PDF2.pdf
+More information about byes, tiebreakers, etc. can be found in the [Magic: The Gathering Tournament Rules](http://www.wizards.com/ContentResources/Wizards/WPN/Main/Documents/Magic_The_Gathering_Tournament_Rules_PDF2.pdf).
 
 License Information
 ===================
 
-Written by Gem Newman.
-http://www.startleddisbelief.com
+Written by Gem Newman. [GitHub](https://github.com/spurll/) | [Blog](http://www.startleddisbelief.com) | [Twitter](https://twitter.com/spurll)
 
-This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+This work is licensed under Creative Commons [BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/).
