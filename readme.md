@@ -45,6 +45,7 @@ Known Bugs
 
 * Pairings can result in multiple byes if bottom-ranked players have already played each other.
 * Players can hypothetically achieve multiple byes (if the tournament goes long and they are once again the bottom-ranked player).
+* The "Remember Me" option on the login page doesn't seem to work anymore.
 
 Both of these bugs can be mitigated by manually re-pairing players using the "Edit Pairings" function.
 
