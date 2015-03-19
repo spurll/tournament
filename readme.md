@@ -1,7 +1,7 @@
 Tournament
 ==========
 
-A web program (with a Flask and SQLite back-end) that facilitates a Magic: The Gathering limited tournament (sealed or draft). Players are randomized, seated, and paired. Match results are recorded, standings may be displayed, etc. Any given user can run (and suspend) multiple tournaments.
+A Python 3/Flask web program that facilitates a Magic: The Gathering limited tournament (sealed or draft). Players are randomized, seated, and paired. Match results are recorded, standings may be displayed, etc. Any given user can run (and suspend) multiple tournaments. Requires LDAP for authentication.
 
 Usage
 =====
@@ -14,7 +14,7 @@ Requirements
 * flask-wtf
 * flask-sqlalchemy
 * sqlalchemy
-* python-ldap
+* ldap3
 
 Configuration
 -------------
@@ -32,13 +32,9 @@ Bugs and Feature Requests
 Feature Requests
 ----------------
 
-The following features may be implemented in the future:
+* I feel like most of the functions in `models.py` should have the `@property` decorator.
 
-* An "undo" fuction would be fairly useful. A single-level undo probably wouldn't be too hard to implement.
-* Verification ("Are you sure?") for some of the more disastrous stuff you can do accidentally. (Dropping players, closing tournaments, etc.)
-* Logging, including the IP address of whomever connects (to satisfy my curiosity as to where people are connecting from).
-
-An older, command-line version of the program can be found in the cli/ directory. It has most of the same features, but will probably not be updated in the future.
+An older, command-line version of the program can be found in the `cli/` directory. It has most of the same features, but will not be updated in the future and may have undocumented bugs.
 
 Known Bugs
 ----------

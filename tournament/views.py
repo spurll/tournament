@@ -6,12 +6,12 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from math import floor, ceil
 from random import shuffle
-import ldap
+import ldap3
 
 from tournament import app, db, lm
-from forms import LoginForm, CreateForm, ReportForm
-from models import User, Tournament, Round, Match, Player
-from authenticate import authenticate
+from tournament.forms import LoginForm, CreateForm, ReportForm
+from tournament.models import User, Tournament, Round, Match, Player
+from tournament.authenticate import authenticate
 
 
 @app.route('/')
@@ -48,10 +48,10 @@ def create_tournament():
     form = CreateForm()
 
     if form.is_submitted():
-        print "Create form submitted. Validating..."
+        print('Create form submitted. Validating...')
 
         if form.validate_on_submit():
-            print "Validated. Creating tournament..."
+            print('Validated. Creating tournament...')
 
             tournament = Tournament(name=form.name.data, user_id=g.user.id)
 
@@ -74,10 +74,9 @@ def create_tournament():
             return redirect(url_for('main_menu'))
         else:
             flash("Error: {}".format(form.errors))
-            print "Unable to validate."
-            print "Errors: {}".format(form.errors)
+            print('Unable to validate: {}'.format(form.errors))
  
-    title = "Create Tournament"
+    title = 'Create Tournament'
     return render_template("create.html", title=title, user=g.user, form=form,
                            round=None)
 
@@ -193,12 +192,12 @@ def seat_players():
     table_count = number_of_tables(len(active))
     table_size = int(ceil(float(len(active)) / table_count))
 
-    for t in xrange(table_count):
-        for s in xrange(table_size):
+    for t in range(table_count):
+        for s in range(table_size):
             index = (t * table_size) + s
             if index < len(active):
                 # Update player objects.
-                print "Index: {}".format(index)
+                print('Index: {}'.format(index))
                 active[index].table = t + 1
                 active[index].seat = s + 1
             else:
@@ -293,8 +292,8 @@ def pair_players():
                 player_count -= 1
 
             # Each player will face an opponent halfway around their table.
-            for i in xrange(player_count / 2):
-                opponent = current[(i + (player_count / 2)) % player_count]
+            for i in range(player_count // 2):
+                opponent = current[(i + (player_count // 2)) % player_count]
 
                 match = create_match(current[i], opponent, table)
                 round.matches.append(match)
@@ -308,8 +307,8 @@ def pair_players():
                 bye_player = unpaired[player_count - 1]
                 player_count -= 1
 
-            for i in xrange(player_count / 2):
-                opponent = unpaired[(i + (player_count / 2)) % player_count]
+            for i in range(player_count // 2):
+                opponent = unpaired[(i + (player_count // 2)) % player_count]
 
                 match = create_match(unpaired[i], opponent, table)
                 round.matches.append(match)
@@ -331,31 +330,44 @@ def pair_players():
         # We can't just look at player.opponent() to see if they've been paired
         # because this round that we're creating doesn't become the "current
         # round" until it's committed to the DB. Consequently,
-        # player.opponent() won't work either. Hence, a list of paired players.
+        # player.opponent() won't work. Hence, a list of paired players.
         paired = []
 
         # Each player faces an opponent not previously faced of similar rank.
-        for i in xrange(len(active)):
+        for i in range(len(active)):
             if active[i] not in paired:
-                for j in xrange(i + 1, len(active)):
+                for j in range(i + 1, len(active)):
                     if active[j] not in paired and \
                             active[j] not in active[i].opponents():
-                        print "Pairing {} with {}.".format(active[i], active[j])
+                        print('Pairing {} with {}.'
+                              .format(active[i], active[j]))
+
                         match = create_match(active[i], active[j], table)
+
                         round.matches.append(match)
-                        table += 1
                         paired.append(active[i])
                         paired.append(active[j])
+
+                        table += 1
                         break
 
                 else:
-                    if not active[i].opponent():
+                    if active[i] not in paired:
                         # BYE
+                        print('{} has a BYE.'.format(active[i]))
                         match = create_match(active[i], None, table)
                         round.matches.append(match)
                         table += 1
+                    else:
+                        print('This should never happen.')
             else:
-                print "{} already has an opponent.".format(active[i])
+                print('{} already has an opponent.'.format(active[i]))
+
+        if not paired:
+            print('All players have BYEs. This is unacceptable.')
+            flash("Unable to pair players with opponents they haven't played. "
+                  "Please select Close Tournament.")
+            return redirect(url_for('main_menu'))
 
     db.session.add(round)
     db.session.commit()
@@ -489,22 +501,21 @@ def report_match():
     win, loss, draw = 0, 0, 0
 
     if form.is_submitted():
-        print "Report form submitted. Validating..."
+        print('Report form submitted. Validating...')
         match = form.match.data
 
         if form.validate_on_submit():
-            print "Validated. Reporting..."
+            print('Validated. Reporting...')
             win = floor(form.seat_1.data)
             loss = floor(form.seat_2.data)
             draw = floor(form.draws.data)
         else:
             flash("Error: {}".format(form.errors))
-            print "Unable to validate."
-            print "Errors: {}".format(form.errors)
+            print('Unable to validate: {}'.format(form.errors))
     else:
         match = request.args.get("match")
 
-    print "Match: {}".format(match)
+    print('Match: {}'.format(match))
     if match: match = Match.query.get(match)
 
     round = tournament.current_round()
@@ -718,15 +729,12 @@ def login():
         username = form.username.data
         password = form.password.data
 
-        try:
-            print "Logging in..."
-            user = authenticate(username, password)
-        except ldap.INVALID_CREDENTIALS:
-            user = None
+        print('Logging in...')
+        user = authenticate(username, password)
 
         if not user:
-            print "Login failed."
-            flash("Login failed.")
+            print('Login failed.')
+            flash('Login failed.')
             return render_template('login.html', title="Log In", form=form)
 
         if user and user.is_authenticated():
@@ -775,7 +783,9 @@ def before_request():
 
 
 def clear_tournaments():
-    Tournament.query.delete()
+    # Cascading wasn't properly deleting players.
+    for t in Tournament.query.all():
+        db.session.delete(t)
     db.session.commit()
 
 

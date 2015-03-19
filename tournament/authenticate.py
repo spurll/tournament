@@ -1,32 +1,41 @@
-import ldap
+from ldap3 import Server, Connection
 
 from tournament import app
-from models import User
+from tournament.models import User
 
 
 def authenticate(username, password):
     user = None
 
-    connection = ldap.initialize(app.config["LDAP_URI"])
+    # Initial connection to the LDAP server.
+    server = Server(app.config['LDAP_URI'])
+    connection = Connection(server)
 
     try:
-        connection.protocol_version = ldap.VERSION3
-        result = connection.search_s(app.config["LDAP_SEARCH_BASE"],
-                                     ldap.SCOPE_SUBTREE,
-                                     'uid={}'.format(username))
+        if not connection.bind(): return None
 
-        if result:
-            ((distinguished_name, entry),) = result     # Username is unique.
-            connection.simple_bind_s(distinguished_name,
-                                     password.encode('iso8859-1'))
+        # Verify that the user exists.
+        result = connection.search(search_base=app.config['LDAP_SEARCH_BASE'],
+                                   search_filter='(uid={})'.format(username),
+                                   attributes=['mail', 'cn'])
 
-            email = entry['mail'][0]
-            name = entry['cn'][0]
-            id = entry['uid'][0]
+        if not result: return None
 
-            user = User(name=name, id=id, email=email)
+        # The user exists!
+        name = connection.response[0]['attributes']['cn'][0]
+        email = connection.response[0]['attributes']['mail'][0]
+
+        # Now attempt to re-bind and authenticate with the password.
+        distinguished_name = connection.response[0]['dn']
+        connection = Connection(server, user=distinguished_name,
+                                password=password.encode('iso8859-1'))
+
+        if not connection.bind(): return None
+
+        # We're authenticated! Create the actual user object.
+        user = User(id=username, name=name, email=email)
 
     finally:
-        connection.unbind_s()
+        connection.unbind()
         return user
 

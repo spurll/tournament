@@ -21,7 +21,7 @@ class User(db.Model):
         return self.id in app.config["ADMIN_USERS"]
 
     def get_id(self):
-        return unicode(self.id)
+        return self.id
 
     def __repr__(self):
         return '<User {}>'.format(self.id)
@@ -56,6 +56,7 @@ class Tournament(db.Model):
     def paired(self):
         # At least one active player has an opponent.
         return True in [p.paired() for p in self.active_players()]
+        # If every single player has a BYE, this doesn't work properly.
 
 
 # Each round contains a number of matches.
