@@ -35,7 +35,7 @@ def list_tournaments():
         flash("You don't have any active tournaments.")
 
     return render_template("list.html", title="Active Tournaments", user=user,
-                           tournaments=tournaments, round=None)
+                           tournaments=tournaments, round=None, next=None)
 
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -77,8 +77,9 @@ def create_tournament():
             print('Unable to validate: {}'.format(form.errors))
  
     title = 'Create Tournament'
+    link = {'url': url_for('list_tournaments'), 'text': 'Cancel'}
     return render_template("create.html", title=title, user=g.user, form=form,
-                           round=None)
+                           round=None, link=link)
 
 
 @app.route('/resume', methods=['GET'])
@@ -165,9 +166,10 @@ def main_menu():
     # We need a way to guarantee that whenever a bye match is created, it is
     # initialized with one player and with seat_1_wins initialized to 2.
 
+    link = {'url': url_for('suspend'), 'text': 'Suspend Tournament'}
     return render_template("tournament.html", title=title, user=user,
                            round=round, seated=seated, paired=paired,
-                           reporting=reporting, reported=reported)
+                           reporting=reporting, reported=reported, link=link)
 
 
 @app.route('/seat')
@@ -233,8 +235,9 @@ def view_seats():
         tables.append(table)
 
     title = "Seating"
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
     return render_template("seating.html", title=title, user=user,
-                           tables=tables, round=None)
+                           tables=tables, round=None, link=link)
 
 
 @app.route('/pair')
@@ -393,7 +396,8 @@ def view_pairs():
     title = "Pairings"
     round = tournament.current_round()
     matches = sorted(round.matches, key=lambda m: m.table_number)
-    return render_template("pairing.html", title=title, user=user,
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
+    return render_template("pairing.html", title=title, user=user, link=link,
                            round=round.round_number, matches=matches)
 
 
@@ -454,9 +458,10 @@ def edit_pairings():
 
     title = "Edit Pairings"
     matches = sorted(round.matches, key=lambda m: m.table_number)
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
     return render_template("edit.html", title=title, user=user,
                            round=round.round_number, matches=matches,
-                           player=player)
+                           player=player, link=link)
 
 
 @app.route('/report')
@@ -478,7 +483,8 @@ def report_results():
     title = "Report Results"
     round = tournament.current_round()
     matches = sorted(round.matches, key=lambda m: m.table_number)
-    return render_template("report.html", title=title, user=user,
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
+    return render_template("report.html", title=title, user=user, link=link,
                            round=round.round_number, matches=matches)
 
 
@@ -542,7 +548,8 @@ def report_match():
     form.seat_1.label = "Wins for {}".format(match.seat_1.name)
     form.seat_2.label = "Wins for {}".format(match.seat_2.name)
     form.match.data = match.id
-    return render_template("match.html", title=title, user=user,
+    link = {'url': url_for('report_results'), 'text': 'Back'}
+    return render_template("match.html", title=title, user=user, link=link,
                            round=round.round_number, match=match, form=form)
 
 
@@ -564,7 +571,8 @@ def standings():
 
     title = "Standings"
     players = sorted(tournament.players.all(), key=rank, reverse=True)
-    return render_template("standings.html", title=title, user=user,
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
+    return render_template("standings.html", title=title, user=user, link=link,
                            round=round, players=players, close=False)
 
 
@@ -586,8 +594,9 @@ def player_stats():
     players = tournament.players
     title = "Detailed Player Statistics"
     round = tournament.current_round().round_number
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
     return render_template("select.html", title=title, user=user, round=round,
-                           players=players, next="player_details")
+                           players=players, next="player_details", link=link)
 
 
 @app.route('/details', methods=['GET'])
@@ -643,8 +652,9 @@ def player_details():
 
     title = "Statistics for {}".format(player.name)
     round = tournament.current_round().round_number
+    link = {'url': url_for('player_stats'), 'text': 'Back'}
     return render_template("stats.html", title=title, user=user, round=round,
-                           player=player, matches=match_details)
+                           player=player, matches=match_details, link=link)
 
 
 @app.route('/drop')
@@ -681,12 +691,15 @@ def drop_player():
 
     players = tournament.active_players()
     title = "Drop Players"
+    link = {'url': url_for('player_stats'), 'text': 'Back'}
     return render_template("select.html", title=title, user=user, round=round,
-                           players=players, next="drop_player")
+                           players=players, next="drop_player", link=link)
 
 
     # If the player is in a match (that hasn't been reported yet), remove them.
     # (Becomes a BYE.)
+
+    #TODO: Wait, why is there a second return call here?
     return redirect(url_for('main_menu'))
 
 
@@ -708,7 +721,8 @@ def close_tournament():
     title = "Final Standings"
     round = tournament.current_round().round_number
     players = sorted(tournament.players.all(), key=rank, reverse=True)
-    return render_template("standings.html", title=title, user=user,
+    link = {'url': url_for('player_stats'), 'text': 'Cancel'}
+    return render_template("standings.html", title=title, user=user, link=link,
                            round=round, players=players, close=tournament.id)
 
 
