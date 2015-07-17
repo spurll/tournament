@@ -691,7 +691,7 @@ def drop_player():
 
     players = tournament.active_players()
     title = "Drop Players"
-    link = {'url': url_for('player_stats'), 'text': 'Back'}
+    link = {'url': url_for('main_menu'), 'text': 'Back'}
     return render_template("select.html", title=title, user=user, round=round,
                            players=players, next="drop_player", link=link)
 
