@@ -19,7 +19,7 @@ Requirements
 Configuration
 -------------
 
-Before starting the server for the first time, run `db_create.py`.
+You'll need to create a `config.py` file, which specifies details such as which LDAP server to use. A sample configuration file can be found at `sample_config.py`.
 
 Starting the Server
 -------------------
@@ -41,7 +41,6 @@ Known Bugs
 
 * Pairings can result in multiple byes if bottom-ranked players have already played each other.
 * Players can hypothetically achieve multiple byes (if the tournament goes long and they are once again the bottom-ranked player).
-* The "Remember Me" option on the login page doesn't seem to work anymore.
 
 Both of these bugs can be mitigated by manually re-pairing players using the "Edit Pairings" function.
 
