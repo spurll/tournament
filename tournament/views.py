@@ -721,7 +721,7 @@ def close_tournament():
     title = "Final Standings"
     round = tournament.current_round().round_number
     players = sorted(tournament.players.all(), key=rank, reverse=True)
-    link = {'url': url_for('player_stats'), 'text': 'Cancel'}
+    link = {'url': url_for('main_menu'), 'text': 'Cancel'}
     return render_template("standings.html", title=title, user=user, link=link,
                            round=round, players=players, close=tournament.id)
 
