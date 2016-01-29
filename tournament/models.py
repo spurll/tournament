@@ -8,12 +8,15 @@ class User(db.Model):
     tournaments = db.relationship('Tournament', backref='user', lazy='dynamic',
                                   cascade='all, delete-orphan')
 
+    @property
     def is_authenticated(self):
         return True
 
+    @property
     def is_active(self):
         return True
 
+    @property
     def is_anonymous(self):
         return False
 
