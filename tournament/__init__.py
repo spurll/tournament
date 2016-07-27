@@ -4,12 +4,12 @@ from flask.ext.login import LoginManager
 
 
 app = Flask(__name__)
-app.config.from_object("config")
+app.config.from_object('config')
 db = SQLAlchemy(app)
 
 lm = LoginManager()
 lm.init_app(app)
-lm.login_view = "login"
+lm.login_view = 'login'
 
 
 # Ensure that tables are created. The order in which this occurs is important:
@@ -20,4 +20,4 @@ from tournament import models
 db.create_all()
 
 
-from tournament import views, models
+from tournament import views
