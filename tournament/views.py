@@ -729,7 +729,7 @@ def close_tournament():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Logs the user in using LDAP authentication.
+    Logs the user in.
     """
     if g.user is not None and g.user.is_authenticated:
         return redirect(url_for('index'))
@@ -737,19 +737,17 @@ def login():
     form = LoginForm()
 
     if request.method == 'GET':
-        return render_template('login.html', title="Log In", form=form)
+        return render_template('login.html', title='Log In', form=form)
 
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
 
-        print('Logging in...')
-        user = authenticate(username, password)
+        user, message = authenticate(username, password)
 
         if not user:
-            print('Login failed.')
-            flash('Login failed.')
-            return render_template('login.html', title="Log In", form=form)
+            flash('Login failed: {}'.format(message))
+            return render_template('login.html', title='Log In', form=form)
 
         if user and user.is_authenticated:
             db_user = User.query.get(user.id)
@@ -761,7 +759,7 @@ def login():
 
             return redirect(request.args.get('next') or url_for('index'))
 
-    return render_template('login.html', title="Log In", form=form)
+    return render_template('login.html', title='Log In', form=form)
 
 
 @app.route('/logout')

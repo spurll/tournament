@@ -12,11 +12,14 @@ basedir = path.abspath(path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(path.join(basedir, 'app.db'))
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-# LDAP
+# Authentication
+AUTH_METHOD = 'LDAP'
+AUTH_URI = None
 LDAP_URI = 'ldap://YOUR.LDAP.URI'
 LDAP_SEARCH_BASE = 'ou=????,dc=????,dc=????'
 
-ADMIN_USERS = ['LDAP.USER.ID.HERE']
+# Admin
+ADMIN_USERS = ['USER.ID.HERE']
 
 # The number of people at an ideal drafting table.
 IDEAL_TABLE = 8

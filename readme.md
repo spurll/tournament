@@ -18,6 +18,7 @@ Requirements
 * flask-sqlalchemy
 * sqlalchemy
 * ldap3
+* requests
 
 Configuration
 -------------
