@@ -1,3 +1,7 @@
+.section {
+    padding: 5px 0 10px;
+}
+
 .reported {
     color: #555555;
 }
@@ -21,7 +25,7 @@
     color: #ffffff;
 }
 
-.bye {
+.bye, .dropped {
     font-weight: bold;
 }
 
@@ -31,6 +35,10 @@
 
 div.create-form {
     padding: 20px 0;
+}
+
+th {
+    text-align: left;
 }
 
 td.remove-link {

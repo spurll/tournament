@@ -20,19 +20,17 @@
             <td>{{ "{:.2f}".format(player.tb_1()) }}</td>
             <td>{{ "{:.2f}".format(player.tb_2()) }}</td>
             <td>{{ "{:.2f}".format(player.tb_3()) }}</td>
-            {% if player.active %}
-            <td></td>
-            {% else %}
-            <td><i>D</i></td>
-            {% endif %}
+            <td class="dropped">{{ "D" if not player.active else "" }}</td>
         </tr>
         {% endfor %}
     </table>
 
     {% if close %}
-    <div class="section"><p>
-        <a href={{ url_for('delete_tournament', id=close) }}>Close Tournament</a>
-    </p></div>
+    <div class="section">
+        <p>
+            <a class="button" href={{ url_for('delete_tournament', id=close) }}>Close Tournament</a>
+        </p>
+    </div>
     {% endif %}
 </div>
 

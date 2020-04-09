@@ -13,19 +13,11 @@
         {% for match in matches %}
         <tr>
             <td>{{ match.table_number} }</td>
-            {% if match.reported() %}
-            <td class="reported">
-            {% else %}
-            <td>
-            {% endif %}
+            <td class={{ "reported" if match.reported() else "" }}>
                 {{ match.seat_1.name }}
             </td>
 
-            {% if match.reported() %}
-            <td class="reported">
-            {% else %}
-            <td>
-            {% endif %}
+            <td class={{ "reported" if match.reported() else "" }}>
                 {% if match.seat_2 %}
                 {{ match.seat_2.name }}
                 {% else %}
@@ -43,13 +35,11 @@
             </td>
 
             <td>
+                {% if match.seat_2 %}
                 <a href={{ url_for('report_match', match=match.id) }}>
-                {% if not match.reported() %}
-                Report
-                {% elif match.seat_2 %}
-                Edit
-                {% endif %}
+                    {{ "Report" if not match.reported() else "Edit" }}
                 </a>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

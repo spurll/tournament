@@ -17,16 +17,19 @@
         {% for match in matches %}
         <tr><td colspan=2>&nbsp;</td></tr>
         <tr><th colspan=2>Match {{ loop.index }}</th></tr>
-        {% if match["opponent"] %}
-        <tr><td>Opponent:</td><td>{{ match["opponent"] }}</th></tr>
-        {% else %}
-        <tr><td>Opponent:</td><td class="bye">&ndash;BYE&ndash;</th></tr>
-        {% endif %}
+        <tr>
+            <td>Opponent:</td>
+            {% if match["opponent"] %}
+            <td>{{ match["opponent"] }}</td>
+            {% else %}
+            <td class="bye">&ndash;BYE&ndash;</td>
+            {% endif %}
+        </tr>
         <tr><td>Result:</td><td>{{ match["result"] }}</td></tr>
-        <tr><td>Games Won:</td><td>{{ match["wins"] }}</th></tr>
-        <tr><td>Games Lost:</td><td>{{ match["losses"] }}</th></tr>
+        <tr><td>Games Won:</td><td>{{ match["wins"] }}</td></tr>
+        <tr><td>Games Lost:</td><td>{{ match["losses"] }}</td></tr>
         {% if match["draws"] %}
-        <tr><td>Draws:</td><td>{{ match["draws"] }}</th></tr>
+        <tr><td>Draws:</td><td>{{ match["draws"] }}</td></tr>
         {% endif %}
         {% endfor %}
     </table>
