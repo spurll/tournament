@@ -1,40 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-	<div class="text">
-		<div class="section">
-			{% if reported %}
-				<p><a href="{{url_for('pair_players')}}">Next Round</a></p>
-			{% elif paired %}
-				<p><a href="{{url_for('report_results')}}">Report Results</a></p>
-			{% endif %}
 
-			{% if not seated %}
-				<p><a href="{{url_for('seat_players')}}">Seat Players</a></p>
-			{% elif not paired %}
-				<p><a href="{{url_for('pair_players')}}">Pair Players</a></p>
-			{% elif not reporting %}
-				<p><a href="{{url_for('edit_pairings')}}">Edit Pairings</a></p>
-			{% endif %}
-		</div>
+<div class="text">
+    <div class="section">
+        {% if reported %}
+        <p><a href={{ url_for('pair_players') }}>Next Round</a></p>
+        {% elif paired %}
+        <p><a href={{ url_for('report_results') }}>Report Results</a></p>
+        {% endif %}
 
-		<div class="section">
-			{% if seated and not paired %}
-				<p><a href="{{url_for('view_seats')}}">View Seating</a></p>
-			{% elif paired %}
-				<p><a href="{{url_for('view_pairs')}}">View Pairings</a></p>
-			{% endif %}
-			<p><a href="{{url_for('standings')}}">View Standings</a></p>
-			{% if round %}
-				<p><a href="{{url_for('player_stats')}}">View Player Stats</a></p>
-			{% endif %}
-		</div>
+        {% if not seated %}
+        <p><a href={{ url_for('seat_players') }}>Seat Players</a></p>
+        {% elif not paired %}
+        <p><a href={{ url_for('pair_players') }}>Pair Players</a></p>
+        {% elif not reporting %}
+        <p><a href={{ url_for('edit_pairings') }}>Edit Pairings</a></p>
+        {% endif %}
+    </div>
 
-		<div class="section">
-			<p><a href="{{url_for('drop_player')}}">Drop Player</a></p>
-			{% if reported %}
-				<p><a href="{{url_for('close_tournament')}}">Close Tournament</a></p>
-			{% endif %}
-		</div>
-	</div>
+    <div class="section">
+        {% if seated and not paired %}
+        <p><a href={{ url_for('view_seats') }}>View Seating</a></p>
+        {% elif paired %}
+        <p><a href={{ url_for('view_pairs') }}>View Pairings</a></p>
+        {% endif %}
+        <p><a href={{ url_for('standings') }}>View Standings</a></p>
+        {% if round %}
+        <p><a href={{ url_for('player_stats') }}>View Player Stats</a></p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <p><a href={{ url_for('drop_player') }}>Drop Player</a></p>
+        {% if reported %}
+        <p><a href={{ url_for('close_tournament') }}>Close Tournament</a></p>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
 

@@ -21,19 +21,19 @@
 							{% if p %}
 								<td>
 									{% if player %}
-										<a href="{{url_for('edit_pairings', player=player.id, opponent=p.id)}}">
+                                    <a href={{ url_for('edit_pairings', player=player.id, opponent=p.id) }}>
 									{% else %}
-										<a href="{{url_for('edit_pairings', player=p.id)}}">
+                                    <a href={{ url_for('edit_pairings', player=p.id) }}>
 									{% endif %}
 
-									{% if player == p %}
-										<span style="color: #ffffff">{{p.name}}</span>
-									{% else %}
-										{{p.name}}
-									{% endif %}
+                                        {% if player == p %}
+                                        <span class="highlight">>{{ p.name }}</span>
+                                        {% else %}
+										{{ p.name }}
+                                        {% endif %}
 								</a></td>
 							{% else %}
-								<td><i>&mdash;BYE&mdash;</i></td>
+								<td class="bye">&ndash;BYE&ndash;</td>
 							{% endif %}
 						{% endfor %}
 					</tr>

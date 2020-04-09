@@ -1,101 +1,102 @@
 {% extends "base.html" %}
 {% block content %}
-	<script type="text/javascript" src="{{url_for('static', filename='jquery-2.1.1.js')}}"></script>
-	<script type="text/javascript">
-		$( document ).ready(function() {
-			// Populate any names that exist in the hidden field on page load.
-			var names = $("#players").val().split("|");
-			for (var i = 0; i < names.length; i++) {
-				createNameElement(names[i]);
-			}
 
-			// Add a handler to catch any ENTER keypresses.
-			$("#add").keypress(function(e) {
-				if (e.which == 13 || e.keyCode == 13) {
-					if ($("#add").val()) {
-						e.preventDefault();
-						add();
-					}
-				}
-			});
+<script type="text/javascript">
+    $( document ).ready(function() {
+        // Populate any names that exist in the hidden field on page load.
+        var names = $("#players").val().split("|");
+        for (var i = 0; i < names.length; i++) {
+            createNameElement(names[i]);
+        }
 
-			$("#name").keypress(function(e) {
-				if (e.which == 13 || e.keyCode == 13) {
-					e.preventDefault();
-					$("#add").focus();
-				}
-			});
+        // Add a handler to catch any ENTER keypresses.
+        $("#add").keypress(function(e) {
+            if (e.which == 13 || e.keyCode == 13) {
+                if ($("#add").val()) {
+                    e.preventDefault();
+                    add();
+                }
+            }
+        });
 
-			$("#reset").click(function(e) {
-				var names = $("#players").val().split("|");
-				for (var i = 0; i < names.length; i++) {
-					remove(names[i]);
-				}
-			});
-		});
+        $("#name").keypress(function(e) {
+            if (e.which == 13 || e.keyCode == 13) {
+                e.preventDefault();
+                $("#add").focus();
+            }
+        });
 
-		function add() {
-			// Grab name from the form field.
-			var name = $("#add").val();
+        $("#reset").click(function(e) {
+            var names = $("#players").val().split("|");
+            for (var i = 0; i < names.length; i++) {
+                remove(names[i]);
+            }
+        });
+    });
 
-			if ($("#players").val()) {
-				var list = $("#players").val().split("|");
-			} else {
-				var list = [];
-			}
+    function add() {
+        // Grab name from the form field.
+        var name = $("#add").val();
 
-			// Check to see if it exists, then add to form.players.
-			var exists = $("#" + name.replace(/ /g, "_")).length > 0;
+        if ($("#players").val()) {
+            var list = $("#players").val().split("|");
+        } else {
+            var list = [];
+        }
 
-			if (name && !exists) {
-				list.push(name)
-				$("#players").val(list.join("|"));
-				createNameElement(name);
-			}
+        // Check to see if it exists, then add to form.players.
+        var exists = $("#" + name.replace(/ /g, "_")).length > 0;
 
-			// Clear the name from the field and give it focus.
-			$("#add").val("");
-			$("#add").focus();
-		}
+        if (name && !exists) {
+            list.push(name)
+            $("#players").val(list.join("|"));
+            createNameElement(name);
+        }
 
-		function remove(name) {
-			// Remove element from form.players.
-			var list = $("#players").val().split("|");
-			list.splice(list.indexOf(name), 1);
-			$("#players").val(list.join("|"));
+        // Clear the name from the field and give it focus.
+        $("#add").val("");
+        $("#add").focus();
+    }
 
-			// Remove visible elements.
-			$("#" + name.replace(/ /g, "_")).remove();
-		}
+    function remove(name) {
+        // Remove element from form.players.
+        var list = $("#players").val().split("|");
+        list.splice(list.indexOf(name), 1);
+        $("#players").val(list.join("|"));
 
-		function createNameElement(name) {
-			// Add the appropriate visible elements and link to remove.
-			var tr = '<tr id="' + name.replace(/ /g, "_") + '"></tr>';
-			$("#player_list").append(tr);
+        // Remove visible elements.
+        $("#" + name.replace(/ /g, "_")).remove();
+    }
 
-			var link = '<a href="javascript:remove(\'' + name + '\')">Remove Player</a>';
-			$("#" + name.replace(/ /g, "_")).append('<td>' + name + '</td>');
-			$("#" + name.replace(/ /g, "_")).append('<td style="width: 30%; text-align: right;">' + link + '</td>');
-		}
-	</script>
+    function createNameElement(name) {
+        // Add the appropriate visible elements and link to remove.
+        var tr = '<tr id="' + name.replace(/ /g, "_") + '"></tr>';
+        $("#player_list").append(tr);
 
-	<div class="text">
-		<form action="" method="POST" name="create">
-			{{form.players}}
-			{{form.hidden_tag()}}
+        var link = '<a href="javascript:remove(\'' + name + '\')">Remove Player</a>';
+        $("#" + name.replace(/ /g, "_")).append('<td>' + name + '</td>');
+        $("#" + name.replace(/ /g, "_")).append('<td class="remove-link">' + link + '</td>');
+    }
+</script>
 
-			<div style="padding-top: 20px; padding-bottom: 20px;">
-				<div class="wide right">{{form.name}}</div>
-				<div class="narrow left">{{form.name.label}}</div>
-				<table id="player_list"></table>
-				<div class="narrow right"><a href="javascript:add()">Add Player</a></div>
-				<div class="wide left">{{form.add(autofocus=True)}}</div>
-			</div>
+<div class="text">
+    <form action="" method="POST" name="create">
+        {{ form.players }}
+        {{ form.hidden_tag() }}
 
-			<div style="text-align: center;">
-				<input type="submit"/><input id="reset" type="reset"/>
-			</div>
-		</form>
-	</div>
+        <div class="create-form">
+            <div class="wide right">{{ form.name }}</div>
+            <div class="narrow left">{{ form.name.label }}</div>
+            <table id="player_list"></table>
+            <div class="narrow right"><a href="javascript:add()">Add Player</a></div>
+            <div class="wide left">{{ form.add(autofocus=True) }}</div>
+        </div>
+
+        <div class="center">
+            <input type="submit"/><input id="reset" type="reset"/>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
 

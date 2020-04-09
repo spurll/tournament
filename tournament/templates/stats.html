@@ -1,34 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-	<div class="text">
-		<table>
-			<tr><td>Player:</td><td>{{player.name}}</td></tr>
-			{% if not player.active %}
-				<tr><td colspan=2><b>Dropped</b></td></tr>
-			{% endif %}
-			<tr><td colspan=2>&nbsp;</td></tr>
 
-			<tr><td>Points:</td><td>{{player.points()}}</td></tr>
-			<tr><td>Opponents' Match Record:</td><td>{{player.op_match_win_percentage()}}</td></tr>
-			<tr><td>{{player.name}}'s Game Record:</td><td>{{player.game_win_percentage()}}</td></tr>
-			<tr><td>Opponents' Game Record:</td><td>{{player.op_game_win_percentage()}}</td></tr>
+<div class="text">
+    <table>
+        <tr><td>Player:</td><td>{{ player.name }}</td></tr>
+        {% if not player.active %}
+        <tr><td colspan=2><b>Dropped</b></td></tr>
+        {% endif %}
+        <tr><td colspan=2>&nbsp;</td></tr>
 
-			{% for match in matches %}
-				<tr><td colspan=2>&nbsp;</td></tr>
-				<tr><th colspan=2>Match {{loop.index}}</th></tr>
-				{% if match["opponent"] %}
-					<tr><td>Opponent:</td><td>{{match["opponent"]}}</th></tr>
-				{% else %}
-				<tr><td>Opponent:</td><td><i>&mdash;BYE&mdash;</i></th></tr>
-				{% endif %}
-				<tr><td>Result:</td><td>{{match["result"]}}</td></tr>
-				<tr><td>Games Won:</td><td>{{match["wins"]}}</th></tr>
-				<tr><td>Games Lost:</td><td>{{match["losses"]}}</th></tr>
-				{% if match["draws"] %}
-					<tr><td>Draws:</td><td>{{match["draws"]}}</th></tr>
-				{% endif %}
-			{% endfor %}
-		</table>
-	</div>
+        <tr><td>Points:</td><td>{{ player.points() }}</td></tr>
+        <tr><td>Opponents' Match Record:</td><td>{{ player.op_match_win_percentage() }}</td></tr>
+        <tr><td>{{ player.name }}'s Game Record:</td><td>{{ player.game_win_percentage() }}</td></tr>
+        <tr><td>Opponents' Game Record:</td><td>{{ player.op_game_win_percentage() }}</td></tr>
+
+        {% for match in matches %}
+        <tr><td colspan=2>&nbsp;</td></tr>
+        <tr><th colspan=2>Match {{ loop.index }}</th></tr>
+        {% if match["opponent"] %}
+        <tr><td>Opponent:</td><td>{{ match["opponent"] }}</th></tr>
+        {% else %}
+        <tr><td>Opponent:</td><td class="bye">&ndash;BYE&ndash;</th></tr>
+        {% endif %}
+        <tr><td>Result:</td><td>{{ match["result"] }}</td></tr>
+        <tr><td>Games Won:</td><td>{{ match["wins"] }}</th></tr>
+        <tr><td>Games Lost:</td><td>{{ match["losses"] }}</th></tr>
+        {% if match["draws"] %}
+        <tr><td>Draws:</td><td>{{ match["draws"] }}</th></tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+</div>
+
 {% endblock %}
 

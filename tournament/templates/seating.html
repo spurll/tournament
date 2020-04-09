@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-	<div class="text">
-		{% for table in tables %}
-			<div class="heading">Table {{loop.index}}</div>
-			<ol>
-				{% for player in table %}
-					<li>{{player.name}}</li>
-				{% endfor %}
-			</ol>
-		{% endfor %}
-	</div>
+
+<div class="text">
+    {% for table in tables %}
+    <h2>Table {{ loop.index }}</h2>
+    <ol>
+        {% for player in table %}
+        <li>{{ player.name }}</li>
+        {% endfor %}
+    </ol>
+    {% endfor %}
+</div>
+
 {% endblock %}
 

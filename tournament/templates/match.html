@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-	<div class="text">
-		<form action="" method="POST" name="report">
-			{{form.match}}
-			{{form.hidden_tag()}}
 
-			<p>
-				<div class="narrow right">{{form.seat_1(min=0, max=2)}}</div>
-				<div class="left">{{form.seat_1.label}}</div>
-			</p>
-			<p>
-				<div class="narrow right">{{form.seat_2(min=0, max=2)}}</div>
-				<div class="left">{{form.seat_2.label}}</div>
-			</p>
-			<p>
-				<div class="narrow right">{{form.draws(min=0, max=3)}}</div>
-				<div class="left">{{form.draws.label}}</div>
-			</p>
+<div class="text">
+    <form action="" method="POST" name="report">
+        {{ form.match }}
+        {{ form.hidden_tag() }}
 
-			<div style="text-align: center;">
-				<input type="submit"/><input id="reset" type="reset"/>
-			</div>
-		</form>
-	</div>
+        <p>
+            <div class="narrow right">{{ form.seat_1(min=0, max=2) }}</div>
+            <div class="left">{{ form.seat_1.label }}</div>
+        </p>
+        <p>
+            <div class="narrow right">{{ form.seat_2(min=0, max=2) }}</div>
+            <div class="left">{{ form.seat_2.label }}</div>
+        </p>
+        <p>
+            <div class="narrow right">{{ form.draws(min=0, max=3) }}</div>
+            <div class="left">{{ form.draws.label }}</div>
+        </p>
+
+        <div class="center">
+            <input type="submit"/><input id="reset" type="reset"/>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
 
