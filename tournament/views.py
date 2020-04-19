@@ -72,9 +72,9 @@ def create_tournament():
             session["tournament"] = tournament.id
 
             return redirect(url_for('main_menu'))
+
         else:
-            flash("Error: {}".format(form.errors))
-            print('Unable to validate: {}'.format(form.errors))
+            flash_errors(form)
  
     title = 'Create Tournament'
     link = {'url': url_for('list_tournaments'), 'text': 'Cancel'}
@@ -516,8 +516,8 @@ def report_match():
             loss = floor(form.seat_2.data)
             draw = floor(form.draws.data)
         else:
-            flash("Error: {}".format(form.errors))
-            print('Unable to validate: {}'.format(form.errors))
+            flash_errors(form)
+
     else:
         match = request.args.get("match")
 
@@ -902,4 +902,16 @@ def rank(p):
     rank += p.tb_2() / 10000        #       100
     rank += p.tb_3() / 10000000     #          090
     return rank                     # 12.03310009
+
+
+def flash_errors(form):
+    for field, messages in form.errors.items():
+        label = getattr(getattr(getattr(form, field), 'label'), 'text', '')
+        label = label.replace(':', '')
+        error = ', '.join(messages)
+
+        message = f'Error in {label}: {error}' if label else 'Error: {error}'
+
+        flash(message)
+        print(message)
 
