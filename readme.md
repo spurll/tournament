@@ -12,11 +12,9 @@ Usage
 Requirements
 ------------
 
-* flask
 * flask-login
 * flask-wtf
 * flask-sqlalchemy
-* sqlalchemy
 * ldap3
 * requests
 
